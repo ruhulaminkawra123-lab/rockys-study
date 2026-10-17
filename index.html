@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rocky HSC">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="রকির AI স্টাডি গাইডার — HSC 2027 মানবিক, বগুড়া। অধ্যায় ট্র্যাকার, রুটিন, টাইমার ও অ্যানালিটিক্স।">
+<title>রকির AI স্টাডি গাইডার · HSC 2027</title>
+<style>
+:root{
+  --bg:#070b14;--card:rgba(16,22,40,.72);--stroke:rgba(255,255,255,.1);
+  --text:#eef2ff;--muted:#8b9bb4;--accent:#818cf8;--cyan:#22d3ee;--gold:#f59e0b;
+  --gold2:#fde047;--ok:#34d399;--danger:#f87171;--pink:#f472b6;
+  --nav-h:74px;--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:"Segoe UI","Nirmala UI","Kalpurush",system-ui,sans-serif;
+  overflow-x:hidden}
+body{padding-bottom:calc(var(--nav-h) + var(--safe-b) + 8px);padding-top:env(safe-area-inset-top,0px)}
+.orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 18s ease-in-out infinite}
+.orb.a{width:320px;height:320px;background:#4f46e5;top:-80px;left:-80px}
+.orb.b{width:280px;height:280px;background:#0891b2;bottom:10%;right:-90px;animation-delay:-6s}
+.orb.c{width:220px;height:220px;background:#7c3aed;bottom:30%;left:20%;animation-delay:-11s;opacity:.28}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-24px) scale(1.08)}}
+#app{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:12px 14px 20px}
+@media(min-width:900px){#app{max-width:980px;padding:18px 22px}}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#22d3ee);display:grid;place-items:center;font-weight:800;font-size:18px;box-shadow:0 8px 24px rgba(99,102,241,.4)}
+.brand h1{font-size:15.5px;font-weight:800;letter-spacing:.2px;line-height:1.2}
+.brand p{font-size:11px;color:var(--muted)}
+.install-btn{border:0;cursor:pointer;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-weight:700;font-size:12px;padding:9px 12px;border-radius:12px;white-space:nowrap;box-shadow:0 6px 18px rgba(79,70,229,.35)}
+.glass{background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--stroke);border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.28)}
+.page.anim{animation:up .32s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cd-wrap{padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.cd-wrap::after{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(253,224,71,.18),transparent 70%)}
+.cd-label{font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cd-cell{text-align:center;background:rgba(0,0,0,.28);border-radius:14px;padding:10px 4px;border:1px solid rgba(255,255,255,.06)}
+.cd-num{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;background:linear-gradient(180deg,#fff,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+.cd-unit{font-size:10px;color:var(--muted);margin-top:3px}
+.quote-banner{padding:14px 16px;margin-bottom:12px;cursor:pointer;position:relative}
+.quote-banner q{font-size:13.5px;line-height:1.65;font-style:italic;color:#dbe4ff;quotes:none;transition:opacity .34s ease}
+.quote-banner .who{margin-top:8px;font-size:11px;color:var(--gold);font-weight:700;transition:opacity .34s ease}
+.quote-banner .hint{margin-top:4px;font-size:10px;color:var(--muted);transition:opacity .34s ease}
+.quote-banner.q-hide q,.quote-banner.q-hide .who,.quote-banner.q-hide .hint{opacity:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{padding:12px 8px;text-align:center}
+.stat b{display:block;font-size:20px;font-weight:800;color:#c7d2fe}
+.stat span{font-size:10.5px;color:var(--muted);line-height:1.3}
+.section-h{display:flex;align-items:center;justify-content:space-between;margin:16px 4px 8px}
+.section-h h2{font-size:14px;font-weight:800}
+.chip{font-size:10.5px;padding:4px 9px;border-radius:999px;background:rgba(129,140,248,.15);color:#c7d2fe;border:1px solid rgba(129,140,248,.25)}
+.chip.gold{background:rgba(245,158,11,.15);color:#fde047;border-color:rgba(245,158,11,.3)}
+.chip.ok{background:rgba(52,211,153,.12);color:#6ee7b7;border-color:rgba(52,211,153,.25)}
+.sub-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sub-card{padding:12px}
+.sub-card .k{font-size:10px;color:var(--muted)}
+.sub-card .n{font-size:13px;font-weight:800;margin:4px 0 8px;line-height:1.35}
+.bar-bg{height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden}
+.bar-fg{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--cyan));width:0;transition:width .5s ease}
+.sess{padding:12px 14px;margin-bottom:8px}
+.sess-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.sess-meta{font-size:10.5px;color:var(--cyan);font-weight:700}
+.sess h3{font-size:13px;margin:3px 0 2px}
+.sess .ch-t{font-size:13.5px;line-height:1.45;color:#e0e7ff}
+.done-btn{border:0;cursor:pointer;background:linear-gradient(135deg,#059669,#34d399);color:#052e1c;font-weight:800;font-size:11px;padding:8px 10px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.done-btn.off{background:rgba(255,255,255,.08);color:var(--muted)}
+.pace{padding:12px 14px;margin-top:4px;font-size:12.5px;line-height:1.55;color:#cbd5e1}
+.routine-item{display:flex;gap:10px;padding:12px;margin-bottom:8px;align-items:flex-start}
+.routine-item.now{border-color:rgba(34,211,238,.45);box-shadow:0 0 0 1px rgba(34,211,238,.25),0 8px 28px rgba(34,211,238,.12)}
+.routine-item.done{opacity:.62}
+.check{width:22px;height:22px;border-radius:7px;border:2px solid rgba(255,255,255,.25);flex-shrink:0;margin-top:2px;display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,.04)}
+.check.on{background:linear-gradient(135deg,#059669,#34d399);border-color:transparent;color:#052e1c;font-weight:900}
+.rt-time{font-size:11px;color:var(--cyan);font-weight:700}
+.rt-title{font-size:13.5px;font-weight:700;line-height:1.4;margin:2px 0}
+.rt-sub{font-size:11.5px;color:var(--muted);line-height:1.45}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:6px;margin-top:4px;font-weight:700}
+.tag.hsc{background:rgba(129,140,248,.18);color:#c7d2fe}
+.tag.code{background:rgba(52,211,153,.15);color:#6ee7b7}
+.tag.en{background:rgba(244,114,182,.15);color:#f9a8d4}
+.tag.life{background:rgba(251,191,36,.12);color:#fde68a}
+.acc{margin-bottom:8px;overflow:hidden}
+.acc-h{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.acc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.acc-h b{flex:1;font-size:13.5px;line-height:1.3}
+.acc-h em{font-style:normal;font-size:11px;color:var(--muted)}
+.acc-b{display:none;padding:0 10px 12px}
+.acc.open .acc-b{display:block}
+.ch-row{display:flex;align-items:flex-start;gap:8px;padding:8px 6px;border-top:1px solid rgba(255,255,255,.05);font-size:12.5px;line-height:1.45;cursor:pointer}
+.ch-row .mini{width:18px;height:18px;border-radius:5px;border:2px solid rgba(255,255,255,.2);flex-shrink:0;margin-top:1px;display:grid;place-items:center;font-size:11px}
+.ch-row.on{color:#86efac}
+.ch-row.on .mini{background:#34d399;border-color:transparent;color:#052e1c}
+.search{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--stroke);background:rgba(0,0,0,.3);color:var(--text);margin-bottom:10px;font-size:13.5px;outline:none}
+.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tbtn{padding:10px 6px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;cursor:pointer;font-size:11.5px;font-weight:700;text-align:center}
+.tbtn.on{background:linear-gradient(135deg,#4f46e5,#6366f1);border-color:transparent;box-shadow:0 6px 20px rgba(79,70,229,.4)}
+.tbtn small{display:block;font-weight:600;color:var(--muted);font-size:10px;margin-top:3px}
+.tbtn.on small{color:#c7d2fe}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;padding:18px 10px 10px}
+.ring-box{position:relative;width:220px;height:220px}
+.ring-wrap svg{width:220px;height:220px;display:block}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.time-big{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.t-actions{display:flex;gap:8px;justify-content:center;margin:12px 0 8px;flex-wrap:wrap}
+.btn{border:0;cursor:pointer;border-radius:12px;padding:11px 18px;font-weight:800;font-size:13px}
+.btn.go{background:linear-gradient(135deg,#4f46e5,#22d3ee);color:#fff}
+.btn.pause{background:rgba(251,191,36,.2);color:#fde047}
+.btn.reset{background:rgba(255,255,255,.08);color:var(--text)}
+.btn.save{background:linear-gradient(135deg,#f59e0b,#fde047);color:#3b2606}
+.hours-box{padding:14px;margin-top:8px}
+.hours-box input{width:90px;padding:8px 10px;border-radius:10px;border:1px solid var(--stroke);background:rgba(0,0,0,.35);color:#fff;font-size:16px;font-weight:700}
+.chart-card{padding:14px;margin-bottom:12px}
+.chart-card h3{font-size:13px;margin-bottom:10px}
+.chart-scroll{overflow-x:auto;padding-bottom:4px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:170px;min-width:100%}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:28px}
+.col .val{font-size:9px;color:var(--muted);margin-bottom:4px;font-variant-numeric:tabular-nums}
+.col .bar{width:70%;max-width:28px;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,#818cf8,#4338ca);min-height:3px;transition:height .4s ease}
+.col.fri .bar{background:linear-gradient(180deg,#fde047,#f59e0b);box-shadow:0 0 14px rgba(245,158,11,.75)}
+.col .lbl{font-size:9px;color:var(--muted);margin-top:5px;text-align:center;line-height:1.2}
+.col.fri .lbl{color:#fde047;font-weight:700}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-top:10px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;padding:8px 10px calc(8px + var(--safe-b));background:linear-gradient(180deg,transparent,rgba(7,11,20,.92) 30%);pointer-events:none}
+.nav-in{pointer-events:auto;display:flex;width:100%;max-width:560px;background:rgba(12,16,32,.88);backdrop-filter:blur(16px);border:1px solid var(--stroke);border-radius:20px;padding:6px;box-shadow:0 -8px 40px rgba(0,0,0,.45)}
+.nav-btn{flex:1;border:0;background:transparent;color:var(--muted);padding:8px 2px 6px;border-radius:14px;cursor:pointer;font-size:10px;font-weight:700}
+.nav-btn svg{display:block;margin:0 auto 3px}
+.nav-btn.on{color:#fff;background:rgba(129,140,248,.18)}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px);transform:translateX(-50%) translateY(20px);background:#0f172a;border:1px solid rgba(52,211,153,.4);color:#d1fae5;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;transition:.3s;z-index:50;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.goal{padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.goal b{color:var(--gold2)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px;margin-bottom:12px}
+.wday{text-align:center;padding:8px 2px;border-radius:10px;font-size:10px;background:rgba(255,255,255,.04);border:1px solid transparent}
+.wday.on{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.18)}
+.wday.fri{color:#fde047}
+.wday b{display:block;font-size:11px;margin-bottom:3px}
+.prog-ring-sm{width:44px;height:44px}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+hr.sep{border:0;border-top:1px solid rgba(255,255,255,.06);margin:10px 0}
+.manual-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.linkish{background:none;border:0;color:var(--accent);font-size:12px;cursor:pointer;font-weight:700}
+@media(min-width:900px){
+  .desk{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;align-items:start}
+  .nav-in{max-width:980px}
+}
+</style>
+</head>
+<body>
+<div class="orbs"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+"use strict";
+
+const EXAM = new Date("2027-06-06T09:00:00");
+const DAYS_BN = ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+const DAYS_SHORT = ["রবি","সোম","মঙ্গল","বুধ","বৃহঃ","শুক্র","শনি"];
+
+function C(id,t){return {id,t};}
+const SUBJECTS = {
+  eng1:{id:"eng1",bn:"ইংরেজি ১ম পত্র",en:"English 1st Paper",short:"Eng ১ম",color:"#818cf8",chapters:[
+    C("eng1-1","Unit 1 L1: The Parrot's Tale"),C("eng1-2","Unit 1 L2: Education and Technology"),C("eng1-3","Unit 1 L3: Children in School"),C("eng1-4","Unit 1 L4: Civic Engagement"),
+    C("eng1-5","Unit 2 L1: What is Beauty?"),C("eng1-6","Unit 2 L2: Folk Music"),C("eng1-7","Unit 2 L3: Art"),C("eng1-8","Unit 2 L4: Craft"),
+    C("eng1-9","Unit 3 L1: Myths of Bengal"),C("eng1-10","Unit 3 L2: Icarus"),C("eng1-11","Unit 3 L3: The Legend of Gazi"),C("eng1-12","Unit 3 L4: Khona"),
+    C("eng1-13","Unit 4 L1: July Uprising: A Transformative Movement"),C("eng1-14","Unit 4 L2: Transformative Speeches"),C("eng1-15","Unit 4 L3: Great Women"),
+    C("eng1-16","Unit 5 L1: Are We Aware of These Rights-I?"),C("eng1-17","Unit 5 L2: Are We Aware of These Rights-II?"),C("eng1-18","Unit 5 L3: Rights to Health and Education"),C("eng1-19","Unit 5 L4: Coal Miners"),C("eng1-20","Unit 5 L5: Frederick Douglass"),
+    C("eng1-21","Unit 6 L1: What is a Dream?"),C("eng1-22","Unit 6 L2: Dreams in Literature"),
+    C("eng1-23","Unit 7 L1: Brojen Das: On Crossing the English Channel"),C("eng1-24","Unit 7 L2: Scaling a Mountain Peak"),C("eng1-25","Unit 7 L3: The Unbeaten Girls"),
+    C("eng1-26","Unit 8 L1: Family Relationship"),C("eng1-27","Unit 8 L2: Warmth in Relationships"),C("eng1-28","Unit 8 L3: A Mother in Mannville"),C("eng1-29","Unit 8 L4: Love"),
+    C("eng1-30","Unit 9 L1: Storm and Stresses of Adolescence"),C("eng1-31","Unit 9 L2: Adolescence and Some Related Problems in Bangladesh"),C("eng1-32","Unit 9 L3: The Story of Shilpi"),C("eng1-33","Unit 9 L4: Say 'No' to Bullying"),
+    C("eng1-34","Unit 10 L1: Manners around the World"),C("eng1-35","Unit 10 L2: Etiquette Netiquette"),C("eng1-36","Unit 10 L3: Food and Culture"),C("eng1-37","Unit 10 L4: Fitness"),C("eng1-38","Unit 10 L5: Consumerism"),
+    C("eng1-39","Unit 11 L1: Situations of Conflict"),C("eng1-40","Unit 11 L2: The Old Man at the Bridge (Hemingway)"),C("eng1-41","Unit 11 L3: Stories From Gaza"),C("eng1-42","Unit 11 L4: Peace in Literature"),C("eng1-43","Unit 11 L5: Opinions through images"),
+    C("eng1-44","Unit 12 L1: Water, Water Everywhere..."),C("eng1-45","Unit 12 L2: The Greta Effect"),C("eng1-46","Unit 12 L3: Endangered Species"),C("eng1-47","Unit 12 L4: What is Environmental Justice?"),C("eng1-48","Unit 12 L5: Limits of the Scientific Method"),
+    C("eng1-49","Reading: Sultana's Dream"),C("eng1-50","Reading: Thank You Ma'am"),C("eng1-51","Reading: Toba Tek Singh"),
+    C("eng1-52","Poem: Deathbed"),C("eng1-53","Poem: \"Hope\" is the thing with feathers"),C("eng1-54","Poem: Bird"),C("eng1-55","Drama: The Proposal")
+  ]},
+  eng2:{id:"eng2",bn:"ইংরেজি ২য় পত্র",en:"English 2nd Paper",short:"Eng ২য়",color:"#a78bfa",chapters:[
+    C("eng2-1","Grammar: Articles & Prepositions"),C("eng2-2","Grammar: Special Uses of Words & Phrases"),C("eng2-3","Grammar: Completing Sentences"),C("eng2-4","Grammar: Right Form of Verbs"),C("eng2-5","Grammar: Narrative Style"),
+    C("eng2-6","Grammar: Pronoun Reference"),C("eng2-7","Grammar: Modifiers"),C("eng2-8","Grammar: Sentence Connectors"),C("eng2-9","Grammar: Synonym and Antonym"),C("eng2-10","Grammar: Punctuation"),
+    C("eng2-11","Writing: Formal Letter/Application"),C("eng2-12","Writing: E-mail"),C("eng2-13","Writing: Report Writing"),C("eng2-14","Writing: Paragraph"),C("eng2-15","Writing: Composition")
+  ]},
+  ban1:{id:"ban1",bn:"বাংলা ১ম পত্র",en:"Bangla 1st Paper",short:"বাংলা ১ম",color:"#f43f5e",chapters:[
+    C("ban1-g1","গদ্য ১. আত্মচরিত (ঈশ্বরচন্দ্র বিদ্যাসাগর)"),C("ban1-g2","গদ্য ২. বাঙ্গালার নব্য লেখকদিগের প্রতি নিবেদন (বঙ্কিমচন্দ্র চট্টোপাধ্যায়)"),C("ban1-g3","গদ্য ৩. কারবালা-প্রান্তর (মীর মশাররফ হোসেন)"),C("ban1-g4","গদ্য ৪. অপরিচিতা (রবীন্দ্রনাথ ঠাকুর)"),
+    C("ban1-g5","গদ্য ৫. সাহিত্যে খেলা (প্রমথ চৌধুরী)"),C("ban1-g6","গদ্য ৬. বিলাসী (শরৎচন্দ্র চট্টোপাধ্যায়)"),C("ban1-g7","গদ্য ৭. অর্ধাঙ্গী (রোকেয়া সাখাওয়াত হোসেন)"),C("ban1-g8","গদ্য ৮. শিক্ষাচিন্তা (কাজী আবদুল ওদুদ)"),
+    C("ban1-g9","গদ্য ৯. আহ্বান (বিভূতিভূষণ বন্দ্যোপাধ্যায়)"),C("ban1-g10","গদ্য ১০. ভুলের মূল্য (কাজী মোতাহার হোসেন)"),C("ban1-g11","গদ্য ১১. যৌবনের গান (কাজী নজরুল ইসলাম)"),C("ban1-g12","গদ্য ১২. তাজমহল (বনফুল)"),
+    C("ban1-g13","গদ্য ১৩. জীবন ও বৃক্ষ (মোতাহের হোসেন চৌধুরী)"),C("ban1-g14","গদ্য ১৪. মানব-কল্যাণ (আবুল ফজল)"),C("ban1-g15","গদ্য ১৫. গন্তব্য কাবুল (সৈয়দ মুজতবা আলী)"),C("ban1-g16","গদ্য ১৬. মাসি-পিসি (মানিক বন্দ্যোপাধ্যায়)"),
+    C("ban1-g17","গদ্য ১৭. কলিমদ্দি দফাদার (আবু জাফর শামসুদ্দীন)"),C("ban1-g18","গদ্য ১৮. সৌদামিনী মালো (শওকত ওসমান)"),C("ban1-g19","গদ্য ১৯. চেতনার অ্যালবাম (আবদুল হক)"),C("ban1-g20","গদ্য ২০. একটি তুলসী গাছের কাহিনি (সৈয়দ ওয়ালীউল্লাহ্)"),
+    C("ban1-g21","গদ্য ২১. মানুষ (মুনীর চৌধুরী)"),C("ban1-g22","গদ্য ২২. মৌসুম (শামসুদ্দীন আবুল কালাম)"),C("ban1-g23","গদ্য ২৩. গহন কোন বনের ধারে (দ্বিজেন শর্মা)"),C("ban1-g24","গদ্য ২৪. কপিলদাস মুর্মুর শেষ কাজ (শওকত আলী)"),
+    C("ban1-g25","গদ্য ২৫. জাদুঘরে কেন যাব (আনিসুজ্জামান)"),C("ban1-g26","গদ্য ২৬. নেকলেস (গী দ্য মোপাসাঁ)"),C("ban1-g27","গদ্য ২৭. রেইনকোট (আখতারুজ্জামান ইলিয়াস)"),C("ban1-g28","গদ্য ২৮. জুলাই অভ্যুত্থানের গ্রাফিতিতে সাহিত্য, গান ও স্লোগান (সংকলিত)"),
+    C("ban1-k1","কবিতা ১. ঋতু বর্ণন (আলাওল)"),C("ban1-k2","কবিতা ২. ফুল্লরার বারোমাস্যা (মুকুন্দরাম চক্রবর্তী)"),C("ban1-k3","কবিতা ৩. স্বদেশ (ঈশ্বরচন্দ্র গুপ্ত)"),C("ban1-k4","কবিতা ৪. বিভীষণের প্রতি মেঘনাদ (মাইকেল মধুসূদন দত্ত)"),
+    C("ban1-k5","কবিতা ৫. সুখ (কায়কোবাদ)"),C("ban1-k6","কবিতা ৬. মানব-বন্দনা (অক্ষয়কুমার বড়াল)"),C("ban1-k7","কবিতা ৭. সোনার তরী (রবীন্দ্রনাথ ঠাকুর)"),C("ban1-k8","কবিতা ৮. ঐকতান (রবীন্দ্রনাথ ঠাকুর)"),
+    C("ban1-k9","কবিতা ৯. নবান্ন (যতীন্দ্রনাথ সেনগুপ্ত)"),C("ban1-k10","কবিতা ১০. বিদ্রোহী (কাজী নজরুল ইসলাম)"),C("ban1-k11","কবিতা ১১. সাম্যবাদী (কাজী নজরুল ইসলাম)"),C("ban1-k12","কবিতা ১২. সুচেতনা (জীবনানন্দ দাশ)"),
+    C("ban1-k13","কবিতা ১৩. প্রতিদান (জসীমউদ্‌দীন)"),C("ban1-k14","কবিতা ১৪. তাহারেই পড়ে মনে (সুফিয়া কামাল)"),C("ban1-k15","কবিতা ১৫. আগে কী সুন্দর দিন কাটাইতাম (শাহ আবদুল করিম)"),C("ban1-k16","কবিতা ১৬. সেই অস্ত্র (আহসান হাবীব)"),
+    C("ban1-k17","কবিতা ১৭. পদ্মা (ফররুখ আহমদ)"),C("ban1-k18","কবিতা ১৮. আলো চাই (সিকান্‌দার আবু জাফর)"),C("ban1-k19","কবিতা ১৯. আঠারো বছর বয়স (সুকান্ত ভট্টাচার্য)"),C("ban1-k20","কবিতা ২০. ফেব্রুয়ারি ১৯৬৯ (শামসুর রাহমান)"),
+    C("ban1-k21","কবিতা ২১. হাড় (আলাউদ্দিন আল আজাদ)"),C("ban1-k22","কবিতা ২২. তোমার আপন পতাকা (হাসান হাফিজুর রহমান)"),C("ban1-k23","কবিতা ২৩. আমি কিংবদন্তির কথা বলছি (আবু জাফর ওবায়দুল্লাহ)"),C("ban1-k24","কবিতা ২৪. নূরলদীনের কথা মনে পড়ে যায় (সৈয়দ শামসুল হক)"),
+    C("ban1-k25","কবিতা ২৫. ছবি (আবু হেনা মোস্তফা কামাল)"),C("ban1-k26","কবিতা ২৬. প্রত্যাবর্তনের লজ্জা (আল মাহমুদ)"),C("ban1-k27","কবিতা ২৭. ব্ল্যাক-আউটের পূর্ণিমায় (শহীদ কাদরী)"),C("ban1-k28","কবিতা ২৮. ভূমিহীন কৃষিজীবী ইচ্ছে তার (মোহাম্মদ মনিরুজ্জামান)"),
+    C("ban1-s1","সহপাঠ: উপন্যাস — লালসালু"),C("ban1-s2","সহপাঠ: নাটক — সিরাজউদ্দৌলা")
+  ]},
+  ban2:{id:"ban2",bn:"বাংলা ২য় পত্র",en:"Bangla 2nd Paper",short:"বাংলা ২য়",color:"#fb7185",chapters:[
+    C("ban2-1","১ম অধ্যায় · ১ম পরিচ্ছেদ: ভাষার পৃথিবী"),C("ban2-2","১ম অধ্যায় · ২য় পরিচ্ছেদ: ভাষারীতি : সাধু ও চলিত"),C("ban2-3","১ম অধ্যায় · ৩য় পরিচ্ছেদ: বাংলা ব্যাকরণ, সংজ্ঞা ও পরিচিতি"),
+    C("ban2-4","২য় অধ্যায় · ১ম পরিচ্ছেদ: ধ্বনিবিজ্ঞান, বাংলা ধ্বনি ও বর্ণ প্রকরণ"),C("ban2-5","২য় অধ্যায় · ২য় পরিচ্ছেদ: বাংলা উচ্চারণের নিয়ম"),C("ban2-6","২য় অধ্যায় · ৩য় পরিচ্ছেদ: বাংলা বানানের নিয়ম"),C("ban2-7","২য় অধ্যায় · ৪র্থ পরিচ্ছেদ: বাগর্থতত্ত্ব"),C("ban2-8","২য় অধ্যায় · ৫ম পরিচ্ছেদ: সন্ধি"),
+    C("ban2-9","৩য় অধ্যায় · ১ম পরিচ্ছেদ: বাংলা ভাষার ব্যাকরণিক শব্দশ্রেণি"),C("ban2-10","৩য় অধ্যায় · ২য় পরিচ্ছেদ: শব্দ"),C("ban2-11","৩য় অধ্যায় · ৩য় পরিচ্ছেদ: বাংলা শব্দগঠন (উপসর্গ, প্রত্যয়, সমাস)"),C("ban2-12","৩য় অধ্যায় · ৪র্থ পরিচ্ছেদ: উপসর্গ"),
+    C("ban2-13","৩য় অধ্যায় · ৫ম পরিচ্ছেদ: প্রকৃতি ও প্রত্যয়"),C("ban2-14","৩য় অধ্যায় · ৬ষ্ঠ পরিচ্ছেদ: সমাস"),C("ban2-15","৩য় অধ্যায় · ৭ম পরিচ্ছেদ: ধ্বন্যাত্মক ও দ্বিরুক্ত শব্দ"),C("ban2-16","৩য় অধ্যায় · ৮ম পরিচ্ছেদ: বাংলা বচন"),
+    C("ban2-17","৩য় অধ্যায় · ৯ম পরিচ্ছেদ: পদাশ্রিত নির্দেশক"),C("ban2-18","৩য় অধ্যায় · ১০ম পরিচ্ছেদ: পুরুষ"),C("ban2-19","৩য় অধ্যায় · ১১শ পরিচ্ছেদ: পুরুষ ও স্ত্রীবাচক শব্দ (লিঙ্গ)"),C("ban2-20","৩য় অধ্যায় · ১২শ পরিচ্ছেদ: ধাতু বা ক্রিয়ামূল"),
+    C("ban2-21","৩য় অধ্যায় · ১৩শ পরিচ্ছেদ: কাল ও ক্রিয়ার কাল"),C("ban2-22","৩য় অধ্যায় · ১৪শ পরিচ্ছেদ: গণনবিধি ও সংখ্যাবাচক শব্দ"),C("ban2-23","৩য় অধ্যায় · ১৫শ পরিচ্ছেদ: কারক ও বিভক্তি"),
+    C("ban2-24","৪র্থ অধ্যায় · ১ম পরিচ্ছেদ: বাক্য প্রকরণ ও পরিবর্তন"),C("ban2-25","৪র্থ অধ্যায় · ২য় পরিচ্ছেদ: বাচ্য ও বাচ্য পরিবর্তন"),C("ban2-26","৪র্থ অধ্যায় · ৩য় পরিচ্ছেদ: উক্তি ও উক্তি পরিবর্তন"),C("ban2-27","৪র্থ অধ্যায় · ৪র্থ পরিচ্ছেদ: যতি/বিরাম/ছেদ চিহ্ন"),C("ban2-28","৪র্থ অধ্যায় · ৫ম পরিচ্ছেদ: বাক্য সংকোচন ও সম্প্রসারণ"),C("ban2-29","৪র্থ অধ্যায় · ৬ষ্ঠ পরিচ্ছেদ: বাগ্‌ধারা ও প্রবাদ-প্রবচন"),
+    C("ban2-30","৫ম অধ্যায় · ১ম পরিচ্ছেদ: বাংলা ভাষার অপপ্রয়োগ ও শুদ্ধ প্রয়োগ"),
+    C("ban2-31","৬ষ্ঠ অধ্যায় · ১ম পরিচ্ছেদ: সমার্থক বা প্রতিশব্দ"),C("ban2-32","৬ষ্ঠ অধ্যায় · ২য় পরিচ্ছেদ: সমোচ্চারিত ও প্রায়-সমোচ্চারিত ভিন্নার্থক শব্দ"),C("ban2-33","৬ষ্ঠ অধ্যায় · ৩য় পরিচ্ছেদ: বিপরীত শব্দ"),C("ban2-34","৬ষ্ঠ অধ্যায় · ৪র্থ পরিচ্ছেদ: একই শব্দের বিশিষ্টার্থক প্রয়োগ"),C("ban2-35","৬ষ্ঠ অধ্যায় · ৫ম পরিচ্ছেদ: অভিধান ও ব্যবহারের নিয়ম"),C("ban2-36","৬ষ্ঠ অধ্যায় · ৬ষ্ঠ পরিচ্ছেদ: শব্দের ব্যুৎপত্তি"),
+    C("ban2-37","৭ম অধ্যায় · ১ম পরিচ্ছেদ: ছন্দ প্রকরণ"),C("ban2-38","৭ম অধ্যায় · ২য় পরিচ্ছেদ: অলংকার প্রকরণ"),
+    C("ban2-39","নির্মিতি: পারিভাষিক শব্দ"),C("ban2-40","নির্মিতি: অনুবাদ"),C("ban2-41","নির্মিতি: দিনলিপি"),C("ban2-42","নির্মিতি: ভাষণ"),C("ban2-43","নির্মিতি: প্রতিবেদন"),C("ban2-44","নির্মিতি: ই-মেইল"),C("ban2-45","নির্মিতি: আবেদনপত্র"),C("ban2-46","নির্মিতি: সারাংশ/ভাব-সম্প্রসারণ"),C("ban2-47","নির্মিতি: সংলাপ"),C("ban2-48","নির্মিতি: খুদে গল্প"),C("ban2-49","নির্মিতি: প্রবন্ধ রচনা")
+  ]},
+  eco1:{id:"eco1",bn:"অর্থনীতি ১ম পত্র",en:"Economics 1st Paper",short:"অর্থ ১ম",color:"#34d399",chapters:[
+    C("eco1-1","১ম অধ্যায়: মৌলিক অর্থনৈতিক সমস্যা এবং এর সমাধান"),C("eco1-2","২য় অধ্যায়: ভোক্তা ও উৎপাদকের আচরণ"),C("eco1-3","৩য় অধ্যায়: উৎপাদন, উৎপাদন ব্যয় ও আয়"),C("eco1-4","৪র্থ অধ্যায়: বাজার"),C("eco1-5","৫ম অধ্যায়: শ্রমবাজার"),
+    C("eco1-6","৬ষ্ঠ অধ্যায়: মূলধন"),C("eco1-7","৭ম অধ্যায়: সংগঠন"),C("eco1-8","৮ম অধ্যায়: খাজনা"),C("eco1-9","৯ম অধ্যায়: সামগ্রিক আয় ও ব্যয়"),C("eco1-10","১০ম অধ্যায়: মুদ্রা ও ব্যাংক")
+  ]},
+  eco2:{id:"eco2",bn:"অর্থনীতি ২য় পত্র",en:"Economics 2nd Paper",short:"অর্থ ২য়",color:"#2dd4bf",chapters:[
+    C("eco2-1","১ম অধ্যায়: বাংলাদেশের অর্থনীতির পরিচয়"),C("eco2-2","২য় অধ্যায়: বাংলাদেশের কৃষি"),C("eco2-3","৩য় অধ্যায়: বাংলাদেশের শিল্প"),C("eco2-4","৪র্থ অধ্যায়: জনসংখ্যা, মানবসম্পদ এবং আত্মকর্মসংস্থান"),C("eco2-5","৫ম অধ্যায়: খাদ্য নিরাপত্তা"),
+    C("eco2-6","৬ষ্ঠ অধ্যায়: অর্থায়ন"),C("eco2-7","৭ম অধ্যায়: মুদ্রাস্ফীতি"),C("eco2-8","৮ম অধ্যায়: আন্তর্জাতিক বাণিজ্য"),C("eco2-9","৯ম অধ্যায়: সরকারি অর্থব্যবস্থা"),C("eco2-10","১০ম অধ্যায়: উন্নয়ন পরিকল্পনা")
+  ]},
+  civ1:{id:"civ1",bn:"পৌরনীতি ও সুশাসন ১ম পত্র",en:"Civics 1st Paper",short:"পৌর ১ম",color:"#38bdf8",chapters:[
+    C("civ1-1","১ম অধ্যায়: পৌরনীতি ও সুশাসন পরিচিতি"),C("civ1-2","২য় অধ্যায়: সুশাসন"),C("civ1-3","৩য় অধ্যায়: মূল্যবোধ, আইন, স্বাধীনতা ও সাম্য"),C("civ1-4","৪র্থ অধ্যায়: ই-গভর্নেন্স ও সুশাসন"),C("civ1-5","৫ম অধ্যায়: নাগরিক অধিকার, কর্তব্য ও মানবাধিকার"),
+    C("civ1-6","৬ষ্ঠ অধ্যায়: রাজনৈতিক দল, নেতৃত্ব ও সুশাসন"),C("civ1-7","৭ম অধ্যায়: সরকার কাঠামো ও সরকারের অঙ্গসমূহ"),C("civ1-8","৮ম অধ্যায়: জনমত ও রাজনৈতিক সংস্কৃতি"),C("civ1-9","৯ম অধ্যায়: জনসেবা ও আমলাতন্ত্র"),C("civ1-10","১০ম অধ্যায়: দেশপ্রেম ও জাতীয়তা")
+  ]},
+  civ2:{id:"civ2",bn:"পৌরনীতি ও সুশাসন ২য় পত্র",en:"Civics 2nd Paper",short:"পৌর ২য়",color:"#22d3ee",chapters:[
+    C("civ2-1","১ম অধ্যায়: ব্রিটিশ ভারতে প্রতিনিধিত্বশীল সরকারের বিকাশ"),C("civ2-2","২য় অধ্যায়: পাকিস্তান থেকে বাংলাদেশ (১৯৪৭-১৯৭১)"),C("civ2-3","৩য় অধ্যায়: রাজনৈতিক ব্যক্তিত্ব: বাংলাদেশের স্বাধীনতা লাভ"),C("civ2-4","৪র্থ অধ্যায়: বাংলাদেশের সংবিধান"),C("civ2-5","৫ম অধ্যায়: বাংলাদেশের সরকার ও প্রশাসনিক কাঠামো"),
+    C("civ2-6","৬ষ্ঠ অধ্যায়: স্থানীয় শাসন"),C("civ2-7","৭ম অধ্যায়: সাংবিধানিক প্রতিষ্ঠান"),C("civ2-8","৮ম অধ্যায়: বাংলাদেশের নির্বাচন ব্যবস্থা"),C("civ2-9","৯ম অধ্যায়: বাংলাদেশের বৈদেশিক নীতি"),C("civ2-10","১০ম অধ্যায়: নাগরিক সমস্যা ও আমাদের করণীয়")
+  ]},
+  psy1:{id:"psy1",bn:"মনোবিজ্ঞান ১ম পত্র",en:"Psychology 1st Paper",short:"মনো ১ম",color:"#f472b6",chapters:[
+    C("psy1-1","১ম অধ্যায়: মনোবিজ্ঞান পরিচিতি"),C("psy1-2","২য় অধ্যায়: আচরণ ও আচরণের বিকাশ"),C("psy1-3","৩য় অধ্যায়: আচরণের জৈবিক ভিত্তি"),C("psy1-4","৪র্থ অধ্যায়: প্রেষণা ও আবেগ"),
+    C("psy1-5","৫ম অধ্যায়: শিক্ষণ ও স্মৃতি"),C("psy1-6","৬ষ্ঠ অধ্যায়: সংবেদন ও প্রত্যক্ষণ"),C("psy1-7","৭ম অধ্যায়: বয়ঃসন্ধিকাল ও মানসিক স্বাস্থ্য"),C("psy1-8","৮ম অধ্যায়: পরিসংখ্যান পরিচিতি")
+  ]},
+  psy2:{id:"psy2",bn:"মনোবিজ্ঞান ২য় পত্র",en:"Psychology 2nd Paper",short:"মনো ২য়",color:"#e879f9",chapters:[
+    C("psy2-1","১ম অধ্যায়: বুদ্ধি"),C("psy2-2","২য় অধ্যায়: ব্যক্তিত্ব"),C("psy2-3","৩য় অধ্যায়: মনোভাব"),C("psy2-4","৪র্থ অধ্যায়: আচরণের উপর পরিবেশের প্রভাব"),
+    C("psy2-5","৫ম অধ্যায়: মানসিক চাপ এবং চাপ মোকাবেলা"),C("psy2-6","৬ষ্ঠ অধ্যায়: মূল্যবোধ"),C("psy2-7","৭ম অধ্যায়: মনোবিজ্ঞানে গবেষণার পদ্ধতিসমূহ"),C("psy2-8","৮ম অধ্যায়: পরিসংখ্যান")
+  ]},
+  geo1:{id:"geo1",bn:"ভূগোল ১ম পত্র",en:"Geography 1st Paper",short:"ভূগোল ১ম",color:"#fbbf24",chapters:[
+    C("geo1-1","১ম অধ্যায়: প্রাকৃতিক ভূগোল"),C("geo1-2","২য় অধ্যায়: পৃথিবীর গঠন"),C("geo1-3","৩য় অধ্যায়: ভূমিরূপ পরিবর্তন"),C("geo1-4","৪র্থ অধ্যায়: বায়ুমণ্ডল ও বায়ুদূষণ"),
+    C("geo1-5","৫ম অধ্যায়: জলবায়ুর উপাদান ও নিয়ামক"),C("geo1-6","৬ষ্ঠ অধ্যায়: জলবায়ু অঞ্চল ও জলবায়ু পরিবর্তন"),C("geo1-7","৭ম অধ্যায়: বারিমণ্ডল"),C("geo1-8","৮ম অধ্যায়: সমুদ্রস্রোত ও জোয়ার-ভাটা")
+  ]},
+  geo2:{id:"geo2",bn:"ভূগোল ২য় পত্র",en:"Geography 2nd Paper",short:"ভূগোল ২য়",color:"#fb923c",chapters:[
+    C("geo2-1","১ম অধ্যায়: মানব ভূগোল"),C("geo2-2","২য় অধ্যায়: জনসংখ্যা"),C("geo2-3","৩য় অধ্যায়: বসতি"),C("geo2-4","৪র্থ অধ্যায়: কৃষি"),C("geo2-5","৫ম অধ্যায়: খনিজ ও শক্তি সম্পদ"),
+    C("geo2-6","৬ষ্ঠ অধ্যায়: শিল্প"),C("geo2-7","৭ম অধ্যায়: পরিবহন ও যোগাযোগ"),C("geo2-8","৮ম অধ্যায়: বাণিজ্য"),C("geo2-9","৯ম অধ্যায়: দূষণ ও দুর্যোগ"),C("geo2-10","১০ম অধ্যায়: মানচিত্র অভিক্ষেপ")
+  ]},
+  ict:{id:"ict",bn:"তথ্য ও যোগাযোগ প্রযুক্তি (ICT)",en:"ICT",short:"ICT",color:"#a3e635",chapters:[
+    C("ict-1","১ম অধ্যায়: তথ্য ও যোগাযোগ প্রযুক্তি : বিশ্ব ও বাংলাদেশ প্রেক্ষিত"),C("ict-2","২য় অধ্যায়: কমিউনিকেশন সিস্টেমস ও নেটওয়ার্কিং"),C("ict-3","৩য় অধ্যায় (১ম অংশ): সংখ্যা পদ্ধতি"),C("ict-4","৩য় অধ্যায় (২য় অংশ): ডিজিটাল ডিভাইস"),
+    C("ict-5","৪র্থ অধ্যায়: ওয়েব ডিজাইন পরিচিতি এবং HTML"),C("ict-6","৫ম অধ্যায় (১ম অংশ): প্রোগ্রামিং ভাষা, অ্যালগরিদম ও ফ্লোচার্ট"),C("ict-7","৫ম অধ্যায় (২য় অংশ): সি প্রোগ্রামিং"),C("ict-8","৬ষ্ঠ অধ্যায়: ডেটাবেজ ম্যানেজমেন্ট সিস্টেম")
+  ]}
+};
+const SUB_ORDER = ["eng1","eng2","ban1","ban2","eco1","eco2","civ1","civ2","psy1","psy2","geo1","geo2","ict"];
+const WEEKLY = {
+  6:{m:"eng1",a:"ban1",note:"শনিবার"},
+  0:{m:"eng2",a:"ban2",note:"রবিবার"},
+  1:{m:"eco1",a:"civ1",note:"সোমবার"},
+  2:{m:"eco2",a:"civ2",note:"মঙ্গলবার"},
+  3:{m:"psy1",a:"geo1",note:"বুধবার"},
+  4:{m:"ict",a:"geo2",note:"বৃহস্পতিবার"},
+  5:{m:"psy2",a:"AUTO",note:"শুক্রবার · রিভিশন ও মডেল টেস্ট"}
+};
+const ROUTINE = [
+  {t:"ভোর ৫:০০ – ৬:০০",d:"১ ঘণ্টা",title:"দৌড়ানো, জগিং ও সকালের ফ্রি-হ্যান্ড ব্যায়াম",sub:"পুশ-আপ, স্কোয়াট ও কার্ডিও। শরীর গরম করে দিন শুরু।",tag:"life",hrs:0,sid:null,from:300,to:360},
+  {t:"সকাল ৬:০০ – ৬:৩০",d:"৩০ মিনিট",title:"ফ্রেশ হওয়া ও হালকা নাস্তা",sub:"হাত-মুখ ধুয়ে টেবিলে বসা। পানি ও হালকা নাস্তা।",tag:"life",hrs:0,sid:null,from:360,to:390},
+  {t:"সকাল ৬:৩০ – ৮:৩০",d:"২ ঘণ্টা",title:"HSC সেশন ১ · মূল বই লাইন বাই লাইন",sub:"দিনের ১ম বিষয়ের ১টি অধ্যায় গভীরভাবে পড়া।",tag:"hsc",hrs:2,sid:"s1",from:390,to:510},
+  {t:"সকাল ৮:৩০ – ৯:০০",d:"৩০ মিনিট",title:"ছোট বিরতি · হাঁটাহাঁটি ও চোখের বিশ্রাম",sub:"ঘরে হালকা হাঁটা, পানি পান ও স্ক্রিন থেকে চোখ সরানো। পরের সেশনের আগে ব্রেইন কুল করা।",tag:"life",hrs:0,sid:null,from:510,to:540},
+  {t:"সকাল ৯:০০ – ৯:৩০",d:"৩০ মিনিট",title:"সকালের প্রধান খাবার",sub:"Breakfast Break — পেট ভরে খেয়ে নেও, তারপর আবার টেবিলে।",tag:"life",hrs:0,sid:null,from:540,to:570},
+  {t:"সকাল ৯:৩০ – ১১:০০",d:"১.৫ ঘণ্টা",title:"HSC সেশন ২ · অধ্যায় ও নোট",sub:"১ম বিষয়ের পরবর্তী অধ্যায় পড়া ও নোট করা।",tag:"hsc",hrs:1.5,sid:"s2",from:570,to:660},
+  {t:"সকাল ১১:০০ – দুপুর ১২:৩০",d:"১.৫ ঘণ্টা",title:"কোডিং সেশন",sub:"Python / Web / JavaScript প্রজেক্ট। ভবিষ্যতের রিমোট ক্যারিয়ার।",tag:"code",hrs:1.5,sid:"code",from:660,to:750},
+  {t:"দুপুর ১২:৩০ – ১:১৫",d:"৪৫ মিনিট",title:"ফ্রি টাইম, স্কিনকেয়ার ও গোসল",sub:"তৈলাক্ত ত্বকের ডার্ক স্পটের জন্য কাঁচা আলুর স্লাইস।",tag:"life",hrs:0,sid:null,from:750,to:795},
+  {t:"দুপুর ১:১৫ – ২:৪৫",d:"১.৫ ঘণ্টা",title:"HSC সেশন ৩ · ২য় বিষয়",sub:"দিনের ২য় বিষয়ের ১টি অধ্যায় মূল বই থেকে পড়া।",tag:"hsc",hrs:1.5,sid:"s3",from:795,to:885},
+  {t:"দুপুর ২:৪৫ – বিকাল ৪:০০",d:"১ ঘণ্টা ১৫ মিনিট",title:"দুপুরের খাবার ও পাওয়ার ন্যাপ",sub:"Lunch + বিশ্রাম। ব্রেইন রিচার্জ।",tag:"life",hrs:0,sid:null,from:885,to:960},
+  {t:"বিকাল ৪:০০ – ৫:৩০",d:"১.৫ ঘণ্টা",title:"HSC সেশন ৪ · অধ্যায় বা বোর্ড প্রশ্ন",sub:"২য় বিষয়ের পরবর্তী অধ্যায় বা বোর্ড প্রশ্ন বিশ্লেষণ।",tag:"hsc",hrs:1.5,sid:"s4",from:960,to:1050},
+  {t:"বিকাল ৫:৩০ – সন্ধ্যা ৬:৩০",d:"১ ঘণ্টা",title:"বাইরে ঘোরাঘুরি, হাঁটাহাঁটি ও আড্ডা",sub:"সন্ধ্যার নাস্তা সহ। সামাজিক ব্যাটারি চার্জ।",tag:"life",hrs:0,sid:null,from:1050,to:1110},
+  {t:"সন্ধ্যা ৬:৩০ – ৭:১৫",d:"৪৫ মিনিট",title:"স্পোকেন ইংলিশ ও ভোকাল প্র্যাকটিস",sub:"দাঁতে কলম রেখে জোরে ইংরেজি রিডিং পড়া।",tag:"en",hrs:0,sid:null,from:1110,to:1155},
+  {t:"সন্ধ্যা ৭:১৫ – রাত ৯:১৫",d:"২ ঘণ্টা",title:"HSC সেশন ৫ · রিভিশন, CQ ও MCQ",sub:"সারাদিনে পড়া ২ বিষয়ের অধ্যায় রিভিশন ও সৃজনশীল/MCQ সলভ।",tag:"hsc",hrs:2,sid:"s5",from:1155,to:1275},
+  {t:"রাত ৯:১৫ – ৯:৪৫",d:"৩০ মিনিট",title:"রাতের খাবার",sub:"Dinner — হালকা ও পুষ্টিকর।",tag:"life",hrs:0,sid:null,from:1275,to:1305},
+  {t:"রাত ৯:৪৫ – ১১:০০",d:"১ ঘণ্টা ১৫ মিনিট",title:"বিছানায় শুয়ে মোবাইল ও ঘুম",sub:"ঠিক ১১টায় ঘুম। রাত ১১:০০ – ভোর ৫:০০ = পাক্কা ৬ ঘণ্টা ঘুম।",tag:"life",hrs:0,sid:null,from:1305,to:1380}
+];
+const SESSIONS = [
+  {id:"s1",name:"সেশন ১",mins:120,hrs:2,step:2},
+  {id:"s2",name:"সেশন ২",mins:90,hrs:1.5,step:5},
+  {id:"code",name:"কোডিং",mins:90,hrs:1.5,step:6},
+  {id:"s3",name:"সেশন ৩",mins:90,hrs:1.5,step:8},
+  {id:"s4",name:"সেশন ৪",mins:90,hrs:1.5,step:10},
+  {id:"s5",name:"সেশন ৫",mins:120,hrs:2,step:13}
+];
+const QUOTES = [
+  {q:"Work like hell. Put in 80 to 100 hour weeks every week. This improves the odds of success.",w:"Elon Musk"},
+  {q:"When something is important enough, you do it even if the odds are not in your favor.",w:"Elon Musk"},
+  {q:"I think it is possible for ordinary people to choose to be extraordinary.",w:"Elon Musk"},
+  {q:"Persistence is very important. You should not give up unless you are forced to give up.",w:"Elon Musk"},
+  {q:"The biggest risk is not taking any risk. In a world that is changing really quickly, the only strategy that is guaranteed to fail is not taking risks.",w:"Mark Zuckerberg"},
+  {q:"Move fast and break things. Unless you are breaking stuff, you are not moving fast enough.",w:"Mark Zuckerberg"},
+  {q:"The question I ask myself like almost every day is, 'Am I doing the most important thing I could be doing?'",w:"Mark Zuckerberg"},
+  {q:"Ideas don't come out fully formed. They only become clear as you work on them. You just have to get started.",w:"Mark Zuckerberg"},
+  {q:"If you get up in the morning and think the future is going to be better, it is a bright day. Otherwise, it's not.",w:"Elon Musk"},
+  {q:"People think a lot about what they should be doing, but they don't spend a lot of time thinking about why they're doing it.",w:"Mark Zuckerberg"}
+];
+
+const LS = {
+  ch:"rocky_ch_v1", rt:"rocky_rt_v1", hr:"rocky_hr_v1", lg:"rocky_lg_v1", mn:"rocky_mn_v1", pt:"rocky_pt_v1"
+};
+function load(k, fb){ try{ const v=JSON.parse(localStorage.getItem(k)); return v??fb; }catch(e){ return fb; } }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+let chapters = load(LS.ch, {});
+let routine = load(LS.rt, {});
+let hours = load(LS.hr, {});
+let logged = load(LS.lg, {});
+let manual = load(LS.mn, {});
+let partials = load(LS.pt, {});
+
+let page = "home";
+let openSub = null;
+let syFilter = "";
+let quoteIdx = 0;
+let deferredPrompt = null;
+let timer = { sid:"s1", remain:120*60, total:120*60, running:false, last:0 };
+let timerInt = null;
+
+function todayISO(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function pad(n){ return String(n).padStart(2,"0"); }
+function nowMins(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+function currentStep(){
+  const m=nowMins();
+  if(m>=1380 || m<300) return -1;
+  for(let i=0;i<ROUTINE.length;i++){ if(m>=ROUTINE[i].from && m<ROUTINE[i].to) return i; }
+  return -1;
+}
+function totalChapters(){ return SUB_ORDER.reduce((s,id)=>s+SUBJECTS[id].chapters.length,0); }
+function doneCount(sid){
+  if(sid){ return SUBJECTS[sid].chapters.filter(c=>chapters[c.id]).length; }
+  return Object.keys(chapters).filter(k=>chapters[k]).length;
+}
+function pct(sid){
+  const tot = SUBJECTS[sid].chapters.length;
+  return tot? doneCount(sid)/tot : 0;
+}
+function weakest(exclude){
+  let min=2, id=SUB_ORDER[0];
+  SUB_ORDER.forEach(s=>{
+    if(exclude && exclude.includes(s)) return;
+    const p=pct(s);
+    if(p<min){ min=p; id=s; }
+  });
+  return id;
+}
+function todayPlan(){
+  const dow=new Date().getDay();
+  const w=WEEKLY[dow];
+  const m=w.m;
+  const a = w.a==="AUTO" ? weakest([m]) : w.a;
+  return { dow, m, a, friday: dow===5, note:w.note };
+}
+function firstOpen(sid, n){
+  const list=[];
+  for(const c of SUBJECTS[sid].chapters){
+    if(!chapters[c.id]) list.push(c);
+    if(list.length>=n) break;
+  }
+  return list;
+}
+function remainingDays(){
+  const ms = EXAM - new Date();
+  return Math.max(0, ms);
+}
+function fmtRemain(){
+  let ms=remainingDays();
+  const d=Math.floor(ms/86400000); ms%=86400000;
+  const h=Math.floor(ms/3600000); ms%=3600000;
+  const m=Math.floor(ms/60000); ms%=60000;
+  const s=Math.floor(ms/1000);
+  return {d,h,m,s};
+}
+function greeting(){
+  const h=new Date().getHours();
+  if(h>=5 && h<12) return "শুভ সকাল";
+  if(h>=12 && h<17) return "শুভ দুপুর";
+  if(h>=17 && h<19) return "শুভ সন্ধ্যা";
+  return "শুভ রাত্রি";
+}
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2600);
+}
+function persistCh(){ save(LS.ch, chapters); }
+function persistRt(){ save(LS.rt, routine); }
+function persistHr(){ save(LS.hr, hours); save(LS.lg, logged); save(LS.mn, manual); save(LS.pt, partials); }
+
+function todayHoursAuto(){
+  const t=todayISO();
+  const lg=logged[t]||{};
+  let sum=0;
+  SESSIONS.forEach(s=>{ if(lg[s.id]) sum+=s.hrs; });
+  hours[t]=sum;
+  return sum;
+}
+function displayHours(date){
+  if(manual[date]!=null && manual[date]!=="") return Number(manual[date]);
+  return Number(hours[date]||0) + Number(partials[date]||0);
+}
+function logSession(sid, on){
+  const t=todayISO();
+  if(!logged[t]) logged[t]={};
+  const sess=SESSIONS.find(s=>s.id===sid);
+  if(!sess) return;
+  if(on){ logged[t][sid]=true; }
+  else { delete logged[t][sid]; }
+  if(manual[t]==null) hours[t]=todayHoursAuto();
+  else todayHoursAuto();
+  persistHr();
+}
+function toggleRoutine(i){
+  const t=todayISO();
+  if(!routine[t]) routine[t]={};
+  const on=!routine[t][i];
+  routine[t][i]=on;
+  persistRt();
+  const step=ROUTINE[i];
+  if(step.sid){
+    logSession(step.sid, on);
+    if(on && !timer.running) toast("+"+step.hrs+" ঘণ্টা লগ হয়েছে");
+  }
+  render();
+}
+function markChapter(id, done, silent){
+  if(done) chapters[id]=true; else delete chapters[id];
+  persistCh();
+  if(done) toast("✅ অধ্যায় সম্পন্ন! পরবর্তী অধ্যায় লোড হয়েছে");
+  if(!silent) render();
+}
+function toggleChapter(id, silent){ markChapter(id, !chapters[id], silent); }
+function refreshSyList(){
+  const box=document.getElementById("syListContainer");
+  if(!box){ render(); return; }
+  box.innerHTML=renderSyList();
+  const chip=document.getElementById("syChip");
+  if(chip) chip.textContent = doneCount()+"/"+totalChapters();
+}
+
+function beep(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(); const g=ctx.createGain();
+    o.type="sine"; o.frequency.value=880; o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.08, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.8);
+    o.start(); o.stop(ctx.currentTime+0.8);
+  }catch(e){}
+  if(navigator.vibrate) navigator.vibrate([200,80,200,80,400]);
+}
+
+function selectSession(id){
+  const s=SESSIONS.find(x=>x.id===id);
+  timer.sid=id; timer.total=s.mins*60; timer.remain=s.mins*60; timer.running=false;
+  render();
+}
+function startTimer(){
+  if(timer.remain<=0){
+    const s=SESSIONS.find(x=>x.id===timer.sid);
+    timer.remain=s.mins*60; timer.total=s.mins*60;
+  }
+  timer.running=true; timer.last=Date.now();
+  if(!timerInt) timerInt=setInterval(tick, 250);
+  render();
+}
+function pauseTimer(){ timer.running=false; render(); }
+function resetTimer(){
+  const s=SESSIONS.find(x=>x.id===timer.sid);
+  timer.running=false; timer.remain=s.mins*60; timer.total=s.mins*60;
+  render();
+}
+function savePartial(){
+  const elapsed = Math.max(0, timer.total - timer.remain);
+  if(elapsed < 60){
+    toast("⏳ অন্তত ১ মিনিট পড়ার পর সেভ করো");
+    return;
+  }
+  const addH = elapsed/3600;
+  const t = todayISO();
+  partials[t] = Math.round(((partials[t]||0) + addH)*100)/100;
+  if(manual[t]!=null && manual[t]!==""){
+    manual[t] = Math.round((Number(manual[t]) + addH)*100)/100;
+  }
+  persistHr();
+  const sess = SESSIONS.find(s=>s.id===timer.sid);
+  const wasRunning = timer.running;
+  timer.running = false;
+  if(timer.remain > 0){
+    timer.total = timer.remain;
+  } else {
+    timer.total = sess.mins*60;
+    timer.remain = sess.mins*60;
+  }
+  if(!routine[t]) routine[t]={};
+  toast("💾 "+addH.toFixed(2)+" ঘণ্টা যোগ হলো ("+sess.name+") · আজ মোট "+displayHours(t)+" ঘণ্টা"+(wasRunning?"":""));
+  render();
+}
+function updateQuoteDOM(){
+  const banners = document.querySelectorAll(".quote-banner");
+  if(!banners.length) return;
+  banners.forEach(b=>b.classList.add("q-hide"));
+  const q = QUOTES[quoteIdx%QUOTES.length];
+  window.setTimeout(()=>{
+    banners.forEach(b=>{
+      const t=b.querySelector("q"), w=b.querySelector(".who");
+      if(t) t.textContent=q.q;
+      if(w) w.textContent="— "+q.w;
+      b.classList.remove("q-hide");
+    });
+  }, 350);
+}
+function tick(){
+  if(!timer.running) return;
+  const now=Date.now();
+  const dt=Math.floor((now-timer.last)/1000);
+  if(dt<=0) return;
+  timer.last+=dt*1000;
+  timer.remain=Math.max(0, timer.remain-dt);
+  if(timer.remain<=0){
+    timer.running=false;
+    logSession(timer.sid, true);
+    const t=todayISO();
+    const sess=SESSIONS.find(s=>s.id===timer.sid);
+    if(!routine[t]) routine[t]={};
+    routine[t][sess.step]=true;
+    persistRt();
+    beep();
+    toast("⏰ "+sess.name+" শেষ! "+sess.hrs+" ঘণ্টা লগ হয়েছে");
+    render();
+  } else {
+    const el=document.getElementById("timeBig");
+    const ring=document.getElementById("ringFg");
+    if(el) el.textContent=fmtTime(timer.remain);
+    if(ring){
+      const r=96, circ=2*Math.PI*r;
+      const p=timer.remain/timer.total;
+      ring.style.strokeDashoffset = String(circ*(1-p));
+    }
+  }
+}
+function fmtTime(sec){
+  const m=Math.floor(sec/60), s=sec%60;
+  return pad(m)+":"+pad(s);
+}
+
+function dateOffset(n){
+  const d=new Date(); d.setDate(d.getDate()-n);
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function isFri(iso){ return new Date(iso+"T12:00:00").getDay()===5; }
+
+function svgI(name){
+  const p={
+    home:'<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/>',
+    list:'<path d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5v16" fill="none" stroke="currentColor" stroke-width="2"/>',
+    timer:'<circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l2.5 1.5M9 3h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    chart:'<path d="M5 19V9m7 10V5m7 14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+  };
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">'+p[name]+'</svg>';
+}
+
+function ringSVG(p, color, size){
+  const r=18, c=2*Math.PI*r, off=c*(1-p);
+  return `<svg class="prog-ring-sm" viewBox="0 0 44 44"><circle cx="22" cy="22" r="${r}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/><circle cx="22" cy="22" r="${r}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 22 22)"/></svg>`;
+}
+
+function renderChart(days){
+  const max=Math.max(10, ...days.map(d=>d.h), 1);
+  const w = days.length>10 ? 'style="min-width:'+(days.length*22)+'px"' : "";
+  return `<div class="chart-scroll"><div class="chart" ${w}>`+days.map(d=>{
+    const h=Math.max(3, (d.h/max)*140);
+    const fri=d.fri?' fri':'';
+    const star=d.fri?'★ ':'';
+    return `<div class="col${fri}"><div class="val">${d.h?d.h.toFixed(d.h%1?1:0):""}</div><div class="bar" style="height:${h}px"></div><div class="lbl">${star}${d.lbl}</div></div>`;
+  }).join("")+`</div></div>`;
+}
+
+function sessCard(label, time, sub, ch, sessId){
+  if(!ch){
+    return `<div class="glass sess"><div class="sess-meta">${label} · ${time}</div><h3>${SUBJECTS[sub].bn}</h3><div class="ch-t">🎉 এই পত্রের সব অধ্যায় সম্পন্ন!</div></div>`;
+  }
+  return `<div class="glass sess">
+    <div class="sess-top">
+      <div>
+        <div class="sess-meta">${label} · ${time} · ${SUBJECTS[sub].short}</div>
+        <h3 style="color:${SUBJECTS[sub].color}">${SUBJECTS[sub].bn}</h3>
+        <div class="ch-t">${ch.t}</div>
+      </div>
+      <button class="done-btn" data-act="donech" data-id="${ch.id}">✅ অধ্যায় সম্পন্ন</button>
+    </div>
+  </div>`;
+}
+
+function renderHome(){
+  const plan=todayPlan();
+  const mCh=firstOpen(plan.m,2);
+  const aCh=firstOpen(plan.a,2);
+  const tot=totalChapters();
+  const done=doneCount();
+  const left=tot-done;
+  const ms=remainingDays();
+  const daysLeft=Math.max(1, Math.ceil(ms/86400000));
+  const pace = left? (daysLeft/left) : 0;
+  const need = daysLeft? (left/daysLeft) : 0;
+  const q=QUOTES[quoteIdx%QUOTES.length];
+  const r = fmtRemain();
+  const t=todayISO();
+  const rtDone = Object.values(routine[t]||{}).filter(Boolean).length;
+
+  let weekHtml='<div class="glass week">';
+  for(let i=0;i<7;i++){
+    const map=[6,0,1,2,3,4,5];
+    const dow=map[i];
+    const w=WEEKLY[dow];
+    const on=dow===plan.dow?" on":"";
+    const fri=dow===5?" fri":"";
+    weekHtml+=`<div class="wday${on}${fri}"><b>${DAYS_SHORT[dow]}</b>${dow===5?"★":SUBJECTS[w.m].short.split(" ")[0]}</div>`;
+  }
+  weekHtml+="</div>";
+
+  return `
+  <div class="glass goal">
+    <div><div class="small muted">${greeting()}, রকি · বগুড়া</div><div>লক্ষ্য: <b>GPA ৪.৫০+</b> · HSC ২০২৭ মানবিক · ১৩ পত্র</div></div>
+    <span class="chip ${plan.friday?"gold":""}">${plan.note}</span>
+  </div>
+  <div class="glass cd-wrap">
+    <div class="cd-label">⏳ HSC ২০২৭ পরীক্ষা · ৬ জুন ২০২৭ · সকাল ৯টা</div>
+    <div class="cd-grid">
+      <div class="cd-cell"><div class="cd-num" id="cdD">${r.d}</div><div class="cd-unit">দিন</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cdH">${pad(r.h)}</div><div class="cd-unit">ঘণ্টা</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cdM">${pad(r.m)}</div><div class="cd-unit">মিনিট</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cdS">${pad(r.s)}</div><div class="cd-unit">সেকেন্ড</div></div>
+    </div>
+  </div>
+  <div class="glass quote-banner" data-act="nextq">
+    <q>${q.q}</q>
+    <div class="who">— ${q.w}</div>
+    <div class="hint">ট্যাপ করো পরের উক্তি</div>
+  </div>
+  <div class="stats">
+    <div class="glass stat"><b>${done}</b><span>সম্পন্ন অধ্যায়</span></div>
+    <div class="glass stat"><b>${left}</b><span>বাকি অধ্যায়</span></div>
+    <div class="glass stat"><b>${rtDone}/${ROUTINE.length}</b><span>আজকের রুটিন</span></div>
+  </div>
+  ${weekHtml}
+  <div class="sub-row">
+    <div class="glass sub-card">
+      <div class="k">সকালের বিষয়</div>
+      <div class="n" style="color:${SUBJECTS[plan.m].color}">${SUBJECTS[plan.m].bn}</div>
+      <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(pct(plan.m)*100)}%;background:${SUBJECTS[plan.m].color}"></div></div>
+      <div class="small muted" style="margin-top:6px">${doneCount(plan.m)}/${SUBJECTS[plan.m].chapters.length} অধ্যায়</div>
+    </div>
+    <div class="glass sub-card">
+      <div class="k">${plan.friday?"শুক্রবার AI পicks":"দুপুর-বিকালের বিষয়"}</div>
+      <div class="n" style="color:${SUBJECTS[plan.a].color}">${SUBJECTS[plan.a].bn}${plan.friday?" ★":""}</div>
+      <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(pct(plan.a)*100)}%;background:${SUBJECTS[plan.a].color}"></div></div>
+      <div class="small muted" style="margin-top:6px">${doneCount(plan.a)}/${SUBJECTS[plan.a].chapters.length} অধ্যায়</div>
+    </div>
+  </div>
+  <div class="section-h"><h2>🤖 AI অধ্যায় গাইডার</h2><span class="chip">২ বিষয় · ৪ অধ্যায়</span></div>
+  ${sessCard("সেশন ১","৬:৩০–৮:৩০ · ২ ঘণ্টা", plan.m, mCh[0], "s1")}
+  ${sessCard("সেশন ২","৯:৩০–১১:০০ · ১.৫ ঘণ্টা", plan.m, mCh[1], "s2")}
+  ${sessCard("সেশন ৩","১:১৫–২:৪৫ · ১.৫ ঘণ্টা", plan.a, aCh[0], "s3")}
+  ${sessCard("সেশন ৪","৪:০০–৫:৩০ · ১.৫ ঘণ্টা", plan.a, aCh[1], "s4")}
+  <div class="glass sess">
+    <div class="sess-meta">সেশন ৫ · ৭:১৫–৯:১৫ · ২ ঘণ্টা · রিভিশন</div>
+    <div class="ch-t">আজকের ৪ অধ্যায়ের রিভিশন, সৃজনশীল (CQ) ও MCQ সলভ করো।${plan.friday?" শুক্রবার: সাপ্তাহিক মডেল টেস্ট দাও।":""}</div>
+  </div>
+  <div class="glass pace">
+    📈 মোট অগ্রগতি <b>${Math.round(done/tot*100)}%</b> (${done}/${tot}) · বাকি <b>${daysLeft}</b> দিন ·
+    প্রয়োজনীয় গতি: দিনে <b>${need.toFixed(2)}</b> অধ্যায় · প্রতি অধ্যায়ে গড়ে <b>${pace.toFixed(2)}</b> দিন সময় আছে।
+    ক্যারিয়ার লুপ: প্রতিদিন <b>১.৫ ঘণ্টা কোডিং</b> + <b>৪৫ মিনিট স্পোকেন ইংলিশ</b>। ঘুম <b>৬ ঘণ্টা</b> (১১টা–৫টা)।
+  </div>`;
+}
+
+function renderRoutine(){
+  const t=todayISO();
+  const st=routine[t]||{};
+  const now=currentStep();
+  const done=ROUTINE.filter((_,i)=>st[i]).length;
+  let html=`<div class="section-h"><h2>📅 আজকের ১৬ ধাপের লাইফ লুপ</h2><span class="chip ok">${done}/${ROUTINE.length}</span></div>
+  <div class="glass pace" style="margin-bottom:10px">HSC পড়া <b>৮.৫ ঘণ্টা</b> (৫ সেশন) + কোডিং <b>১.৫ ঘণ্টা</b> + ইংলিশ <b>৪৫ মিনিট</b> + ঘুম <b>৬ ঘণ্টা</b>। সেশন টিক করলে ঘণ্টা অটো-লগ হবে।</div>`;
+  ROUTINE.forEach((r,i)=>{
+    const on=!!st[i];
+    const isNow=now===i;
+    const tagName={hsc:"HSC পড়া",code:"কোডিং",en:"স্পোকেন ইংলিশ",life:"লাইফ"}[r.tag];
+    html+=`<div class="glass routine-item ${on?"done":""} ${isNow?"now":""}" data-act="rt" data-i="${i}">
+      <div class="check ${on?"on":""}">${on?"✓":""}</div>
+      <div style="flex:1">
+        <div class="rt-time">${r.t} · ${r.d}${isNow?' · <span style="color:#22d3ee">● এখন</span>':""}${r.hrs?` · +${r.hrs} ঘণ্টা`:""}</div>
+        <div class="rt-title">${r.title}</div>
+        <div class="rt-sub">${r.sub}</div>
+        <span class="tag ${r.tag}">${tagName}</span>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+function renderSyllabus(){
+  const tot=totalChapters(), done=doneCount();
+  let html=`<div class="section-h"><h2>📚 সিলেবাস ট্র্যাকার · ১৩ পত্র</h2><span class="chip" id="syChip">${done}/${tot}</span></div>
+  <input class="search" id="sySearch" placeholder="অধ্যায় খুঁজুন..." value="${syFilter.replace(/"/g,"&quot;")}">`;
+  return html+`<div id="syListContainer">`+renderSyList()+`</div><div style="margin-top:10px;text-align:center"><button class="linkish" data-act="reset">⚠ সব অগ্রগতি রিসেট</button></div>`;
+}
+function renderSyList(){
+  const q=syFilter.trim().toLowerCase();
+  let html="";
+  SUB_ORDER.forEach(id=>{
+    const s=SUBJECTS[id];
+    const d=doneCount(id), n=s.chapters.length, p=Math.round(d/n*100);
+    const open=openSub===id;
+    let rows="";
+    s.chapters.forEach((c,idx)=>{
+      if(q && c.t.toLowerCase().indexOf(q)===-1) return;
+      const on=!!chapters[c.id];
+      rows+=`<div class="ch-row ${on?"on":""}" data-act="ch" data-id="${c.id}"><div class="mini">${on?"✓":(idx+1)}</div><div>${c.t}</div></div>`;
+    });
+    if(q && !rows && s.bn.toLowerCase().indexOf(q)===-1) return;
+    html+=`<div class="glass acc ${open||q?"open":""}">
+      <div class="acc-h" data-act="acc" data-id="${id}">
+        <span class="acc-dot" style="background:${s.color}"></span>
+        <b>${s.bn}</b>
+        ${ringSVG(d/n, s.color)}
+        <em>${d}/${n} · ${p}%</em>
+      </div>
+      <div class="acc-b">${rows||'<div class="small muted" style="padding:8px">কিছু মেলেনি</div>'}</div>
+    </div>`;
+  });
+  if(!html) html=`<div class="glass" style="padding:16px;text-align:center"><span class="muted">কিছু মেলেনি — অন্য শব্দ দিয়ে খুঁজুন</span></div>`;
+  return html;
+}
+
+function renderTimer(){
+  const t=todayISO();
+  const shown=displayHours(t);
+  const auto=todayHoursAuto();
+  const pt=Number(partials[t]||0);
+  const s=SESSIONS.find(x=>x.id===timer.sid);
+  const r=96, circ=2*Math.PI*r;
+  const p=timer.total? timer.remain/timer.total : 0;
+  const elapsed=Math.max(0, timer.total-timer.remain);
+  const elapsedTxt = elapsed>=60 ? (elapsed/3600).toFixed(2)+" ঘণ্টা" : (elapsed? elapsed+" সেকেন্ড":"শুরু হয়নি");
+  const btns=SESSIONS.map(x=>`<button class="tbtn ${timer.sid===x.id?"on":""}" data-act="selsess" data-id="${x.id}">${x.name}<small>${x.mins} মিনিট</small></button>`).join("");
+  return `<div class="section-h"><h2>⏱ মাল্টি-সেশন টাইমার</h2><span class="chip">আজ ${shown} ঘণ্টা</span></div>
+  <div class="timer-grid">${btns}</div>
+  <div class="glass ring-wrap">
+    <div class="ring-box">
+    <svg viewBox="0 0 220 220">
+      <circle cx="110" cy="110" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="12"/>
+      <circle id="ringFg" cx="110" cy="110" r="${r}" fill="none" stroke="url(#tg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-p)}" transform="rotate(-90 110 110)"/>
+      <defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs>
+    </svg>
+    <div class="ring-center">
+      <div class="time-big" id="timeBig">${fmtTime(timer.remain)}</div>
+      <div class="small muted">${s.name} · ${s.hrs} ঘণ্টা লগ হবে</div>
+    </div>
+    </div>
+    <div class="t-actions">
+      ${timer.running?`<button class="btn pause" data-act="pause">⏸ পজ</button>`:`<button class="btn go" data-act="start">▶ স্টার্ট</button>`}
+      <button class="btn reset" data-act="resetT">↺ রিসেট</button>
+      <button class="btn save" data-act="savepart">💾 যতটুকু পড়েছি সেভ করো</button>
+    </div>
+    <div class="small muted" style="margin-top:4px">চলমান সেশনে অতিবাহিত: <b style="color:#fde047">${elapsedTxt}</b></div>
+  </div>
+  <div class="glass hours-box">
+    <div class="row-between"><b>আজকের পড়ার ঘণ্টা</b><span class="chip">${shown} hrs</span></div>
+    <div class="small muted" style="margin-top:6px">অটো লগ (সেশন টিক/টাইমার): ${auto} ঘণ্টা + পার্শিয়াল সেভ: ${pt} ঘণ্টা = <b style="color:#a5b4fc">${(auto+pt).toFixed(2)} ঘণ্টা</b>। ম্যানুয়ালি সেট করলে সেটাই চার্টে যাবে।</div>
+    <div class="manual-row">
+      <input id="hrIn" type="number" min="0" max="24" step="0.5" value="${manual[t]!=null?manual[t]:shown}">
+      <button class="btn go" data-act="savehr">ঘণ্টা সেভ</button>
+      <button class="linkish" data-act="clearmn">অটোতে ফিরে যাও</button>
+    </div>
+  </div>`;
+}
+
+function renderAnalytics(){
+  const d7=[], d30=[];
+  for(let i=6;i>=0;i--){
+    const iso=dateOffset(i);
+    const dt=new Date(iso+"T12:00:00");
+    d7.push({h:displayHours(iso), fri:isFri(iso), lbl:DAYS_SHORT[dt.getDay()]});
+  }
+  for(let i=29;i>=0;i--){
+    const iso=dateOffset(i);
+    const dt=new Date(iso+"T12:00:00");
+    d30.push({h:displayHours(iso), fri:isFri(iso), lbl:String(dt.getDate())});
+  }
+  const last7=d7.reduce((s,x)=>s+x.h,0);
+  const last30=d30.reduce((s,x)=>s+x.h,0);
+  const avg7=last7/7, avg30=last30/30;
+  let streak=0;
+  for(let i=0;i<400;i++){
+    const iso=dateOffset(i);
+    if(displayHours(iso)>0) streak++; else { if(i>0) break; }
+  }
+  const tot=totalChapters(), done=doneCount();
+  let subRows="";
+  SUB_ORDER.forEach(id=>{
+    const s=SUBJECTS[id]; const d=doneCount(id); const n=s.chapters.length;
+    subRows+=`<div style="margin:8px 0"><div class="row-between small"><span style="color:${s.color};font-weight:700">${s.bn}</span><span class="muted">${d}/${n}</span></div>
+    <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(d/n*100)}%;background:${s.color}"></div></div></div>`;
+  });
+  return `
+  <div class="stats">
+    <div class="glass stat"><b>${avg7.toFixed(1)}</b><span>৭ দিনের গড় ঘণ্টা</span></div>
+    <div class="glass stat"><b>${avg30.toFixed(1)}</b><span>৩০ দিনের গড়</span></div>
+    <div class="glass stat"><b>${streak}</b><span>স্ট্রিক (দিন)</span></div>
+  </div>
+  <div class="glass chart-card">
+    <h3>📊 গত ৭ দিনের পড়াশোনা</h3>
+    ${renderChart(d7)}
+    <div class="legend"><span><i class="dot" style="background:#818cf8"></i>সাধারণ দিন</span><span><i class="dot" style="background:#f59e0b"></i>শুক্রবার ★ রিভিশন/মডেল টেস্ট</span></div>
+  </div>
+  <div class="glass chart-card">
+    <h3>📈 গত ৩০ দিন</h3>
+    ${renderChart(d30)}
+    <div class="small muted" style="margin-top:8px">মোট ${last30.toFixed(1)} ঘণ্টা · শুক্রবারগুলো সোনালি বারে চিহ্নিত</div>
+  </div>
+  <div class="glass" style="padding:14px">
+    <div class="section-h" style="margin-top:0"><h2>পত্রভিত্তিক অগ্রগতি</h2><span class="chip">${Math.round(done/tot*100)}%</span></div>
+    ${subRows}
+  </div>
+  <div class="glass quote-banner" style="margin-top:12px" data-act="nextq">
+    <q>${QUOTES[quoteIdx%QUOTES.length].q}</q>
+    <div class="who">— ${QUOTES[quoteIdx%QUOTES.length].w}</div>
+    <div class="hint">ট্যাপ করো পরের উক্তি</div>
+  </div>`;
+}
+
+function navBar(){
+  const items=[["home","হোম","home"],["routine","রুটিন","list"],["syllabus","সিলেবাস","book"],["timer","টাইমার","timer"],["analytics","চার্ট","chart"]];
+  return `<nav class="nav"><div class="nav-in">${items.map(i=>`<button class="nav-btn ${page===i[0]?"on":""}" data-act="nav" data-p="${i[0]}">${svgI(i[2])}${i[1]}</button>`).join("")}</div></nav>`;
+}
+
+function render(animate){
+  const pages={home:renderHome, routine:renderRoutine, syllabus:renderSyllabus, timer:renderTimer, analytics:renderAnalytics};
+  document.getElementById("app").innerHTML = `
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">র</div>
+        <div><h1>রকির AI স্টাডি গাইডার</h1><p>HSC 2027 · মানবিক · বগুড়া</p></div>
+      </div>
+      <button class="install-btn" data-act="install">📲 অ্যাপ ইন্সটল</button>
+    </div>
+    <div class="page ${animate?"anim":""}">${pages[page]()}</div>
+    ${navBar()}`;
+  const sy=document.getElementById("sySearch");
+  if(sy){
+    sy.addEventListener("input", e=>{
+      syFilter=e.target.value;
+      if(!openSub) openSub="eng1";
+      const box=document.getElementById("syListContainer");
+      if(box) box.innerHTML=renderSyList();
+    });
+    sy.addEventListener("keydown", e=>{ if(e.key==="Escape"){ syFilter=""; sy.value=""; const box=document.getElementById("syListContainer"); if(box) box.innerHTML=renderSyList(); } });
+  }
+}
+
+document.getElementById("app").addEventListener("click", e=>{
+  const b=e.target.closest("[data-act]");
+  if(!b) return;
+  const act=b.dataset.act;
+  if(act==="nav"){ page=b.dataset.p; render(true); }
+  else if(act==="donech") markChapter(b.dataset.id, true);
+  else if(act==="ch"){ toggleChapter(b.dataset.id, true); refreshSyList(); }
+  else if(act==="rt") toggleRoutine(Number(b.dataset.i));
+  else if(act==="acc"){
+    openSub = openSub===b.dataset.id? null : b.dataset.id;
+    refreshSyList();
+  }
+  else if(act==="nextq"){ quoteIdx=(quoteIdx+1)%QUOTES.length; updateQuoteDOM(); }
+  else if(act==="selsess") selectSession(b.dataset.id);
+  else if(act==="savepart") savePartial();
+  else if(act==="start") startTimer();
+  else if(act==="pause") pauseTimer();
+  else if(act==="resetT") resetTimer();
+  else if(act==="savehr"){
+    const v=document.getElementById("hrIn").value;
+    const t=todayISO();
+    manual[t]=Number(v); persistHr(); toast("আজকের ঘণ্টা সেভ হয়েছে: "+v); render();
+  }
+  else if(act==="clearmn"){ delete manual[todayISO()]; persistHr(); render(); }
+  else if(act==="install") installApp();
+  else if(act==="reset"){
+    if(confirm("সব অধ্যায়, রুটিন ও ঘণ্টার ডেটা মুছে যাবে। নিশ্চিত?")){
+      chapters={}; routine={}; hours={}; logged={}; manual={}; partials={};
+      persistCh(); persistRt(); persistHr(); toast("রিসেট সম্পন্ন"); render();
+    }
+  }
+});
+
+setInterval(()=>{
+  const r=fmtRemain();
+  const d=document.getElementById("cdD");
+  if(d){ d.textContent=r.d; document.getElementById("cdH").textContent=pad(r.h); document.getElementById("cdM").textContent=pad(r.m); document.getElementById("cdS").textContent=pad(r.s); }
+},1000);
+setInterval(()=>{ quoteIdx=(quoteIdx+1)%QUOTES.length; updateQuoteDOM(); }, 14000);
+
+function generateIcon(size){
+  const c=document.createElement("canvas"); c.width=c.height=size;
+  const ctx=c.getContext("2d");
+  const g=ctx.createLinearGradient(0,0,size,size);
+  g.addColorStop(0,"#4338ca"); g.addColorStop(1,"#0891b2");
+  ctx.fillStyle=g;
+  const r=size*0.22;
+  ctx.beginPath();
+  ctx.moveTo(r,0); ctx.arcTo(size,0,size,size,r); ctx.arcTo(size,size,0,size,r); ctx.arcTo(0,size,0,0,r); ctx.arcTo(0,0,size,0,r);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.font=`800 ${size*0.42}px system-ui,sans-serif`;
+  ctx.fillText("R", size/2, size/2 - size*0.04);
+  ctx.font=`700 ${size*0.12}px system-ui`;
+  ctx.fillStyle="#c7d2fe";
+  ctx.fillText("HSC 27", size/2, size/2 + size*0.28);
+  return c.toDataURL("image/png");
+}
+
+async function setupPWA(){
+  const icon192=generateIcon(192), icon512=generateIcon(512);
+  const manifest={
+    name:"রকির AI স্টাডি গাইডার",
+    short_name:"Rocky HSC",
+    description:"HSC 2027 Humanities study guider & analytics for Rocky, Bogura.",
+    start_url:"./",
+    scope:"./",
+    display:"standalone",
+    orientation:"portrait",
+    background_color:"#070b14",
+    theme_color:"#4f46e5",
+    lang:"bn-BD",
+    icons:[
+      {src:icon192,sizes:"192x192",type:"image/png",purpose:"any maskable"},
+      {src:icon512,sizes:"512x512",type:"image/png",purpose:"any maskable"}
+    ]
+  };
+  const mUrl=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/json"}));
+  const link=document.createElement("link"); link.rel="manifest"; link.href=mUrl; document.head.appendChild(link);
+  const apple=document.createElement("link"); apple.rel="apple-touch-icon"; apple.href=icon192; document.head.appendChild(apple);
+
+  const swJS = `
+    const CACHE='rocky-hsc-v1';
+    self.addEventListener('install', e => {
+      self.skipWaiting();
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./','./index.html']).catch(()=>{})));
+    });
+    self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        fetch(e.request).then(res => {
+          const copy=res.clone();
+          caches.open(CACHE).then(c => { try{ c.put(e.request, copy); }catch(err){} });
+          return res;
+        }).catch(() => caches.match(e.request).then(r => r || caches.match('./') || caches.match('./index.html')))
+      );
+    });
+  `;
+  if("serviceWorker" in navigator){
+    try{
+      const swUrl=URL.createObjectURL(new Blob([swJS],{type:"application/javascript"}));
+      await navigator.serviceWorker.register(swUrl,{scope:"./"});
+    }catch(err){
+      try{
+        await navigator.serviceWorker.register("data:application/javascript,"+encodeURIComponent(swJS));
+      }catch(e2){}
+    }
+  }
+}
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.finally(()=>{ deferredPrompt=null; });
+  } else {
+    const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    toast(isiOS? "Safari Share → Add to Home Screen চাপুন":"ব্রাউজার মেনু থেকে Add to Home Screen / Install app বেছে নিন");
+  }
+}
+window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredPrompt=e; });
+
+setupPWA();
+render(true);
+})();
+</script>
+</body>
+</html>
