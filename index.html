@@ -101,35 +101,76 @@ body{padding-bottom:calc(var(--nav-h) + var(--safe-b) + 8px);padding-top:env(saf
 .ch-row.on{color:#86efac}
 .ch-row.on .mini{background:#34d399;border-color:transparent;color:#052e1c}
 .search{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--stroke);background:rgba(12,18,34,.9);color:var(--text);margin-bottom:10px;font-size:13.5px;outline:none}
-.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.tbtn{padding:10px 6px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;cursor:pointer;font-size:11.5px;font-weight:700;text-align:center}
+/* ===== Timer (merged engine) ===== */
+.timer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.tbtn{padding:10px 6px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--text);border-radius:14px;cursor:pointer;font-size:11.5px;font-weight:700;text-align:center;font-family:inherit}
 .tbtn.on{background:linear-gradient(135deg,#4f46e5,#6366f1);border-color:transparent;box-shadow:0 4px 14px rgba(79,70,229,.35)}
 .tbtn small{display:block;font-weight:600;color:var(--muted);font-size:10px;margin-top:3px}
 .tbtn.on small{color:#c7d2fe}
-.ring-wrap{display:flex;flex-direction:column;align-items:center;padding:18px 10px 10px}
+.cust{display:none;grid-template-columns:1fr 1fr;gap:10px;padding:12px;margin-bottom:12px}
+.cust.show{display:grid}
+.cust label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}
+.in{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--stroke);background:rgba(0,0,0,.35);color:var(--text);font-size:15px;font-weight:700;outline:none;font-family:inherit}
+.in:focus{border-color:rgba(129,140,248,.7)}
+select.in{font-size:13px;font-weight:600}
+select.in option{background:#0f172a;color:#eef2ff}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 12px 14px;margin-bottom:12px}
+.tm-phase{font-size:12.5px;font-weight:800;color:var(--cyan);margin-bottom:8px}
 .ring-box{position:relative;width:220px;height:220px}
 .ring-wrap svg{width:220px;height:220px;display:block}
-.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-.time-big{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
-.t-actions{display:flex;gap:8px;justify-content:center;margin:12px 0 8px;flex-wrap:wrap}
-.btn{border:0;cursor:pointer;border-radius:12px;padding:11px 18px;font-weight:800;font-size:13px}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding:0 30px;text-align:center}
+.time-big{font-size:44px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1.1}
+.tm-cur{font-size:12px;font-weight:800;line-height:1.3;margin-top:4px;max-width:150px}
+.t-actions{display:flex;gap:8px;justify-content:center;margin:12px 0 0;flex-wrap:wrap;width:100%}
+.btn{border:0;cursor:pointer;border-radius:12px;padding:11px 16px;font-weight:800;font-size:13px;font-family:inherit;color:var(--text)}
+.btn:active{transform:scale(.97)}
 .btn.go{background:linear-gradient(135deg,#4f46e5,#22d3ee);color:#fff}
 .btn.pause{background:rgba(251,191,36,.2);color:#fde047}
-.btn.reset{background:rgba(255,255,255,.08);color:var(--text)}
 .btn.save{background:linear-gradient(135deg,#f59e0b,#fde047);color:#3b2606}
-.hours-box{padding:14px;margin-top:8px}
-.hours-box input{width:90px;padding:8px 10px;border-radius:10px;border:1px solid var(--stroke);background:rgba(0,0,0,.35);color:#fff;font-size:16px;font-weight:700}
-.chart-card{padding:14px;margin-bottom:12px}
-.chart-card h3{font-size:13px;margin-bottom:10px}
-.chart-scroll{overflow-x:auto;padding-bottom:4px}
-.chart{display:flex;align-items:flex-end;gap:6px;height:170px;min-width:100%}
-.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:28px}
-.col .val{font-size:9px;color:var(--muted);margin-bottom:4px;font-variant-numeric:tabular-nums}
-.col .bar{width:70%;max-width:28px;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,#818cf8,#4338ca);min-height:3px;transition:height .3s ease}
-.col.fri .bar{background:linear-gradient(180deg,#fde047,#f59e0b);box-shadow:0 0 10px rgba(245,158,11,.55)}
-.col .lbl{font-size:9px;color:var(--muted);margin-top:5px;text-align:center;line-height:1.2}
-.col.fri .lbl{color:#fde047;font-weight:700}
-.legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-top:10px}
+.btn.skip{background:rgba(255,255,255,.08)}
+.btn.tog{background:rgba(255,255,255,.06);border:1px solid var(--stroke);width:100%}
+.btn.tog.on{background:rgba(34,211,238,.14);border-color:rgba(34,211,238,.5);color:#67e8f9}
+.btn.plain{background:rgba(255,255,255,.07);border:1px solid var(--stroke)}
+.ring-wrap.brk .tm-phase,.ring-wrap.brk .time-big{color:var(--gold2)}
+.ring-wrap.brk .btn.go{background:linear-gradient(135deg,#f59e0b,#fde047);color:#3b2606}
+.tm-prog{width:100%;margin-top:14px}
+.sbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sbtn{display:flex;flex-direction:column;gap:3px;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;font-family:inherit}
+.sbtn.on{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
+.sbtn .k{font-size:10px;color:var(--muted)}
+.sbtn b{font-size:12.5px;line-height:1.3}
+.sbtn small{font-size:11px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.sbtn:only-child{grid-column:1/-1}
+.sub-box{padding:14px;margin-bottom:12px}
+/* ===== Analytics (merged engine) ===== */
+.an-card{padding:14px;margin-bottom:12px}
+.an-card h2{font-size:14px;font-weight:800;margin-bottom:10px}
+.stat.t b{font-size:17px;font-variant-numeric:tabular-nums}
+.stat.t:first-child b{color:var(--ok)}
+.tbar{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.tbar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .4s}
+.tbar>i.ok{background:var(--ok)}
+.wgoal{position:relative;height:18px;border-radius:99px;background:rgba(0,0,0,.35) repeating-linear-gradient(90deg,transparent 0 calc(12.5% - 1px),rgba(255,255,255,.1) calc(12.5% - 1px) 12.5%);border:1px solid var(--stroke);overflow:hidden}
+.wgoal>i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .4s;opacity:.92}
+.wgoal>i.ok{background:var(--ok)}
+.wgoal>u{position:absolute;top:0;bottom:0;left:87.5%;width:2px;background:var(--gold)}
+.gl{position:relative;height:16px;margin-top:4px;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gl span{position:absolute;top:0;white-space:nowrap}
+.gl span:nth-child(1){left:0}
+.gl span:nth-child(2){left:87.5%;transform:translateX(-50%);color:var(--gold2)}
+.gl span:nth-child(3){right:0}
+.status{margin-top:10px;display:inline-block;padding:4px 12px;border-radius:99px;font-weight:800;font-size:13px;border:1px solid}
+.scroll{max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
+.li{display:grid;grid-template-columns:100px 1fr 64px;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12.5px}
+.li:last-child{border:0}
+.li .n{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.li.hit .n{color:var(--ok)}
+.sj-row{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.sj-row:last-child{border:0}
+.sj-row .tbar{margin:5px 0 7px}
+.sj-row .n{font-variant-numeric:tabular-nums;font-weight:700}
+.bk-row{display:flex;gap:8px;flex-wrap:wrap}
+.bk-row .btn{flex:1;min-width:150px}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;padding:8px 10px calc(8px + var(--safe-b));background:linear-gradient(180deg,transparent,rgba(7,11,20,.95) 35%);pointer-events:none}
 .nav-in{pointer-events:auto;display:flex;width:100%;max-width:560px;background:rgba(14,20,38,.96);border:1px solid var(--stroke);border-radius:20px;padding:6px;box-shadow:0 -6px 24px rgba(0,0,0,.4)}
@@ -336,8 +377,9 @@ let openSub = null;
 let syFilter = "";
 let quoteIdx = 0;
 let deferredPrompt = null;
-let timer = { sid:"s1", remain:120*60, total:120*60, running:false, last:0 };
-let timerInt = null;
+let T=null;      // live timer state (timestamps)
+let S=null;      // study store: second-level logs, timer cfg, sync
+let lastMin=-1;
 
 function todayISO(){
   const d=new Date();
@@ -403,10 +445,12 @@ function greeting(){
   if(h>=17 && h<19) return "শুভ সন্ধ্যা";
   return "শুভ রাত্রি";
 }
+let toastT=null;
 function toast(msg){
   const el=document.getElementById("toast");
   el.textContent=msg; el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"), 2400);
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove("show"), 2600);
 }
 function persistCh(){ save(LS.ch, chapters); }
 function persistRt(){ save(LS.rt, routine); }
@@ -444,7 +488,7 @@ function toggleRoutine(i){
   const step=ROUTINE[i];
   if(step.sid){
     logSession(step.sid, on);
-    if(on && !timer.running) toast("+"+step.hrs+" ঘণ্টা লগ হয়েছে");
+    if(on && !T.running) toast("+"+step.hrs+" ঘণ্টা লগ হয়েছে");
   }
   render(false);
 }
@@ -463,62 +507,293 @@ function refreshSyList(){
   if(chip) chip.textContent = doneCount()+"/"+totalChapters();
 }
 
-function beep(){
-  try{
-    const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const o=ctx.createOscillator(); const g=ctx.createGain();
-    o.type="sine"; o.frequency.value=880; o.connect(g); g.connect(ctx.destination);
-    g.gain.setValueAtTime(0.08, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.8);
-    o.start(); o.stop(ctx.currentTime+0.8);
-  }catch(e){}
-  if(navigator.vibrate) navigator.vibrate([200,80,200,80,400]);
+/* ================= Study engine: drift-proof timer + second-level logs ================= */
+const SKEY="rocky_st_v1";
+const DATE_RE=/^\d{4}-\d{2}-\d{2}$/;
+const HSC_SESS=["s1","s2","s3","s4","s5"];
+const $=id=>document.getElementById(id);
+const BASE_TITLE=document.title;
+const num=v=>{v=Number(v);return isFinite(v)&&v>0?v:0};
+const isBook=b=>Object.prototype.hasOwnProperty.call(SUBJECTS,b);
+const isObj=o=>!!o&&typeof o==="object"&&!Array.isArray(o);
+const dk=d=>{d=d||new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fmtHM=s=>Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";
+
+/* ---- Store ---- */
+function normS(o){
+  o=isObj(o)?o:{};
+  const r={logs:{},cfg:{mode:"classic",cf:25,cb:5,wl:false},over:null,sync:{},timer:null};
+  if(isObj(o.logs)){
+    for(const d in o.logs){
+      if(!DATE_RE.test(d)||!isObj(o.logs[d]))continue;
+      const row={};
+      for(const b in o.logs[d]){
+        if(!(isBook(b)||b==="rev"))continue;
+        const v=Math.floor(num(o.logs[d][b]));
+        if(v)row[b]=v;
+      }
+      if(Object.keys(row).length)r.logs[d]=row;
+    }
+  }
+  if(isObj(o.cfg)){
+    const c=o.cfg;
+    if(["classic","deep","custom"].includes(c.mode))r.cfg.mode=c.mode;
+    r.cfg.cf=Math.min(240,Math.max(1,Math.round(num(c.cf))||25));
+    r.cfg.cb=Math.min(60,Math.max(1,Math.round(num(c.cb))||5));
+    r.cfg.wl=!!c.wl;
+  }
+  if(isObj(o.over)&&isBook(o.over.book)&&DATE_RE.test(String(o.over.date)))r.over={date:o.over.date,book:o.over.book};
+  if(isObj(o.sync)){
+    for(const d in o.sync){
+      if(!DATE_RE.test(d)||!isObj(o.sync[d]))continue;
+      const row={};
+      HSC_SESS.forEach(id=>{if(o.sync[d][id])row[id]=true});
+      r.sync[d]=row;
+    }
+  }
+  if(isObj(o.timer))r.timer=o.timer;
+  return r;
+}
+function loadS(){S=normS(load(SKEY,null))}
+let storeWarned=false;
+function saveS(){
+  try{save(SKEY,S)}
+  catch(e){if(!storeWarned){storeWarned=true;toast("⚠️ ডেটা সেভ হচ্ছে না — ব্রাউজার স্টোরেজ বন্ধ/পূর্ণ। এখনই ব্যাকআপ নাও।")}}
 }
 
-function selectSession(id){
-  const s=SESSIONS.find(x=>x.id===id);
-  timer.sid=id; timer.total=s.mins*60; timer.remain=s.mins*60; timer.running=false;
-  render(false);
+/* ---- Analytics helpers ---- */
+const logSum=k=>{const l=S.logs[k];return l?Object.values(l).reduce((a,b)=>a+b,0):0};
+/* routine-session credit & older hour logs (seconds). Day total = larger of the two, so nothing double counts */
+const legacySecs=k=>Math.round(displayHours(k)*3600);
+const dayTotal=k=>Math.max(logSum(k),legacySecs(k));
+const rangeTotal=n=>{let s=0;const d=new Date();for(let i=0;i<n;i++)s+=dayTotal(dk(addDays(d,-i)));return s};
+function streakCount(){
+  let d=new Date();
+  if(dayTotal(dk(d))<18000)d=addDays(d,-1);
+  let c=0;
+  while(c<2000&&dayTotal(dk(d))>=18000){c++;d=addDays(d,-1)}
+  return c;
 }
-function startTimer(){
-  if(timer.remain<=0){
-    const s=SESSIONS.find(x=>x.id===timer.sid);
-    timer.remain=s.mins*60; timer.total=s.mins*60;
-  }
-  timer.running=true; timer.last=Date.now();
-  if(!timerInt) timerInt=setInterval(tick, 1000);
-  render(false);
+function addLog(book,secs){const k=dk();S.logs[k]=S.logs[k]||{};S.logs[k][book]=(S.logs[k][book]||0)+secs}
+
+/* ---- Subject selection (linked to the 13 papers & today's plan) ---- */
+function defaultBook(){const p=todayPlan();return nowMins()<795?p.m:p.a}
+function activeBook(){return(S.over&&S.over.date===dk()&&isBook(S.over.book))?S.over.book:defaultBook()}
+function setBook(b){
+  if(!isBook(b))return;
+  flushPend();
+  S.over={date:dk(),book:b};
+  saveS();
+  if(page==="timer")render(false);
 }
-function pauseTimer(){ timer.running=false; render(false); }
-function resetTimer(){
-  const s=SESSIONS.find(x=>x.id===timer.sid);
-  timer.running=false; timer.remain=s.mins*60; timer.total=s.mins*60;
-  render(false);
+
+/* ---- Timer engine (timestamps, never decrements) ---- */
+const fMs=()=>(S.cfg.mode==="classic"?25:S.cfg.mode==="deep"?50:S.cfg.cf)*60000;
+const bMs=()=>(S.cfg.mode==="custom"?S.cfg.cb:5)*60000;
+function initTimer(){
+  const t=S.timer;
+  T={phase:"focus",running:false,endAt:0,rem:fMs(),last:0,pend:0,sess:0};
+  if(t&&(t.phase==="focus"||t.phase==="break")){
+    T.phase=t.phase;T.running=!!t.running;T.endAt=num(t.endAt);
+    T.rem=num(t.rem)||(t.phase==="focus"?fMs():bMs());
+    T.last=num(t.last);T.pend=num(t.pend);T.sess=num(t.sess);
+  }
+  if(T.running&&!(T.endAt>0&&T.last>0))T.running=false;
 }
-function savePartial(){
-  const elapsed = Math.max(0, timer.total - timer.remain);
-  if(elapsed < 60){
-    toast("⏳ অন্তত ১ মিনিট পড়ার পর সেভ করো");
-    return;
+function persistTimer(){S.timer=Object.assign({},T);saveS()}
+function flushPend(){
+  if(!T)return;
+  if(T.running&&T.phase==="focus"){
+    const now=Math.min(Date.now(),T.endAt);
+    T.pend+=Math.max(0,now-T.last);T.last=now;
   }
-  const addH = elapsed/3600;
-  const t = todayISO();
-  partials[t] = Math.round(((partials[t]||0) + addH)*100)/100;
-  if(manual[t]!=null && manual[t]!==""){
-    manual[t] = Math.round((Number(manual[t]) + addH)*100)/100;
+  const s=Math.floor(T.pend/1000);
+  if(s>0){
+    T.pend-=s*1000;T.sess+=s;
+    addLog(activeBook(),s);
+    syncRoutine();
+    persistTimer();
   }
-  persistHr();
-  const sess = SESSIONS.find(s=>s.id===timer.sid);
-  timer.running = false;
-  if(timer.remain > 0){
-    timer.total = timer.remain;
-  } else {
-    timer.total = sess.mins*60;
-    timer.remain = sess.mins*60;
+}
+/* Timer -> Routine: as today's timed study crosses each HSC session length (120/90/90/75/75 min), tick that routine step once */
+function syncRoutine(){
+  const t=dk(),tot=logSum(t);
+  S.sync[t]=S.sync[t]||{};
+  let cum=0;const names=[];
+  HSC_SESS.forEach(id=>{
+    const s=SESSIONS.find(x=>x.id===id);
+    cum+=s.mins*60;
+    if(tot>=cum&&!S.sync[t][id]){
+      S.sync[t][id]=true;
+      if(!routine[t])routine[t]={};
+      if(!routine[t][s.step]){
+        routine[t][s.step]=true;
+        logSession(id,true);
+        names.push(s.name);
+      }
+    }
+  });
+  if(names.length){
+    persistRt();
+    toast("✅ "+names.join(", ")+" রুটিনে অটো-টিক হয়েছে");
+    if(page==="home"||page==="routine")render(false);
   }
-  if(!routine[t]) routine[t]={};
-  toast("💾 "+addH.toFixed(2)+" ঘণ্টা যোগ হলো ("+sess.name+") · আজ মোট "+displayHours(t)+" ঘণ্টা");
-  render(false);
+}
+let AC=null;
+function actx(){
+  try{
+    AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended")AC.resume();
+  }catch(e){}
+  return AC;
+}
+function chime(){
+  try{
+    const c=actx();
+    if(c){
+      const notes=[784,988,1175,1568],t0=c.currentTime+.05;
+      for(let r=0;r<3;r++)notes.forEach((f,i)=>{
+        const t=t0+r*1.2+i*.18,o=c.createOscillator(),g=c.createGain();
+        o.type="sine";o.frequency.value=f;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(.35,t+.02);
+        g.gain.exponentialRampToValueAtTime(.0001,t+.9);
+        o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+1);
+      });
+    }
+    if(navigator.vibrate)navigator.vibrate([300,150,300,150,600]);
+  }catch(e){}
+}
+function phaseEnd(loud){
+  if(T.phase==="focus"){
+    flushPend();T.pend=0;
+    const st=Math.min(Date.now(),T.endAt);           /* break starts when focus really ended */
+    T.phase="break";T.rem=bMs();T.endAt=st+T.rem;T.last=st;T.running=true;
+    if(loud){chime();toast("🎉 ফোকাস শেষ! এবার "+Math.round(T.rem/60000)+" মিনিট বিরতি নাও।")}
+  }else{
+    T.phase="focus";T.rem=fMs();T.running=false;T.endAt=0;T.last=0;T.sess=0;
+    if(loud){chime();toast("☕ বিরতি শেষ! আবার শুরু করো।")}
+    relWL();
+  }
+  persistTimer();
+}
+function tick(){
+  if(T&&T.running){
+    if(T.phase==="focus")flushPend();
+    let guard=0;
+    while(T.running&&Date.now()>=T.endAt&&guard++<3)phaseEnd(Date.now()-T.endAt<8000);
+  }
+  paintTitle();
+  if(page==="timer")paintTimer();
+  const sig=Math.floor(dayTotal(dk())/60);
+  if(sig!==lastMin){
+    lastMin=sig;
+    if(page==="timer")paintToday();
+    else if(page==="analytics")refreshAnalytics();
+  }
+}
+function startT(){
+  actx();
+  if(T.running)return;
+  const now=Date.now();
+  T.endAt=now+T.rem;T.last=now;T.running=true;
+  persistTimer();reqWL();paintTimer();
+}
+function pauseT(){
+  if(!T.running)return;
+  flushPend();
+  T.rem=Math.max(1000,T.endAt-Date.now());T.running=false;
+  persistTimer();paintTimer();
+}
+function saveStop(){
+  if(T.running)flushPend();
+  const ss=T.sess;
+  T.phase="focus";T.running=false;T.endAt=0;T.last=0;T.pend=0;T.rem=fMs();T.sess=0;
+  persistTimer();relWL();paintTimer();
+  toast(ss>0?"💾 "+Math.floor(ss/60)+" মি "+(ss%60)+" সে সেভ হয়েছে ✔":"টাইমার রিসেট হয়েছে");
+}
+function skipBreak(){
+  T.phase="focus";T.rem=fMs();T.running=false;T.endAt=0;T.last=0;T.sess=0;
+  persistTimer();relWL();paintTimer();
+}
+function timerLocked(){return T.running||(T.phase==="break"&&T.endAt>0)}
+function setMode(m){
+  if(timerLocked()){toast("আগে বর্তমান সেশন থামাও");return}
+  S.cfg.mode=m;T.phase="focus";T.rem=fMs();T.sess=0;
+  persistTimer();paintTimer();
+}
+function applyCustom(){
+  const cf=$("tmCf"),cb=$("tmCb");
+  if(!cf||!cb)return;
+  if(timerLocked()){toast("আগে বর্তমান সেশন থামাও");cf.value=S.cfg.cf;cb.value=S.cfg.cb;return}
+  S.cfg.cf=Math.min(240,Math.max(1,Math.round(num(cf.value))||25));
+  S.cfg.cb=Math.min(60,Math.max(1,Math.round(num(cb.value))||5));
+  cf.value=S.cfg.cf;cb.value=S.cfg.cb;
+  if(T.phase==="focus")T.rem=fMs();
+  persistTimer();paintTimer();
+}
+function remNow(){return T.running?Math.max(0,T.endAt-Date.now()):T.rem}
+function paintTitle(){
+  if(T&&T.running){const s=Math.ceil(remNow()/1000);document.title=pad(Math.floor(s/60))+":"+pad(s%60)+" • "+BASE_TITLE}
+  else if(document.title!==BASE_TITLE)document.title=BASE_TITLE;
+}
+
+/* ---- Screen Wake Lock ---- */
+let wlk=null;
+async function reqWL(){
+  if(!S.cfg.wl||!T.running||!("wakeLock" in navigator))return;
+  try{if(!wlk||wlk.released)wlk=await navigator.wakeLock.request("screen")}catch(e){}
+}
+function relWL(){try{if(wlk){wlk.release();wlk=null}}catch(e){}}
+function toggleWL(){
+  if(!("wakeLock" in navigator)){toast("এই ব্রাউজারে স্ক্রিন-অন সাপোর্ট নেই");return}
+  S.cfg.wl=!S.cfg.wl;saveS();
+  if(S.cfg.wl)reqWL();else relWL();
+  paintTimer();
+}
+
+/* ---- Backup & restore (everything: chapters, routine, hours, second-level logs) ---- */
+function exportBackup(){
+  flushPend();
+  try{
+    const study=Object.assign({},S,{timer:null});
+    const payload={app:"rocky-hsc-study",v:2,exported:new Date().toISOString(),
+      data:{chapters,routine,hours,logged,manual,partials,study}};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download="rocky-hsc-backup-"+dk()+".json";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    toast("✅ ব্যাকআপ ডাউনলোড হয়েছে");
+  }catch(e){toast("ব্যাকআপ তৈরি করা যায়নি")}
+}
+function importBackup(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result),d=isObj(j)&&isObj(j.data)?j.data:j;
+      if(!isObj(d))throw 0;
+      /* accepts this app's backup and the older standalone timer backup ({logs,cfg,...}) */
+      const study=isObj(d.study)?d.study:(isObj(d.logs)?d:null);
+      const known=study||isObj(d.chapters)||isObj(d.routine)||isObj(d.hours)||isObj(d.logged);
+      if(!known)throw 0;
+      if(!confirm("বর্তমান সব ডেটা এই ব্যাকআপ দিয়ে প্রতিস্থাপন করবে। চালিয়ে যাবে?"))return;
+      relWL();
+      if(isObj(d.chapters)){chapters={};for(const k in d.chapters)if(d.chapters[k])chapters[k]=true}
+      if(isObj(d.routine))routine=d.routine;
+      if(isObj(d.hours))hours=d.hours;
+      if(isObj(d.logged))logged=d.logged;
+      if(isObj(d.manual))manual=d.manual;
+      if(isObj(d.partials))partials=d.partials;
+      if(study){S=normS(study);S.timer=null}
+      persistCh();persistRt();persistHr();saveS();
+      initTimer();lastMin=-1;render(false);
+      toast("✅ ব্যাকআপ রিস্টোর হয়েছে");
+    }catch(e){toast("❌ ফাইলটি সঠিক ব্যাকআপ নয়")}
+  };
+  r.onerror=()=>toast("ফাইল পড়া যায়নি");
+  r.readAsText(file);
 }
 function updateQuoteDOM(){
   const banners = document.querySelectorAll(".quote-banner");
@@ -533,35 +808,6 @@ function updateQuoteDOM(){
       b.classList.remove("q-hide");
     });
   }, 260);
-}
-function tick(){
-  if(!timer.running) return;
-  const now=Date.now();
-  const dt=Math.floor((now-timer.last)/1000);
-  if(dt<=0) return;
-  timer.last+=dt*1000;
-  timer.remain=Math.max(0, timer.remain-dt);
-  if(timer.remain<=0){
-    timer.running=false;
-    logSession(timer.sid, true);
-    const t=todayISO();
-    const sess=SESSIONS.find(s=>s.id===timer.sid);
-    if(!routine[t]) routine[t]={};
-    routine[t][sess.step]=true;
-    persistRt();
-    beep();
-    toast("⏰ "+sess.name+" শেষ! "+sess.hrs+" ঘণ্টা লগ হয়েছে");
-    render(false);
-  } else {
-    const el=document.getElementById("timeBig");
-    const ring=document.getElementById("ringFg");
-    if(el) el.textContent=fmtTime(timer.remain);
-    if(ring){
-      const r=96, circ=2*Math.PI*r;
-      const p=timer.remain/timer.total;
-      ring.style.strokeDashoffset = String(circ*(1-p));
-    }
-  }
 }
 function fmtTime(sec){
   const m=Math.floor(sec/60), s=sec%60;
@@ -590,16 +836,6 @@ function ringSVG(p, color){
   return `<svg class="prog-ring-sm" viewBox="0 0 44 44"><circle cx="22" cy="22" r="${r}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/><circle cx="22" cy="22" r="${r}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 22 22)"/></svg>`;
 }
 
-function renderChart(days){
-  const max=Math.max(10, ...days.map(d=>d.h), 1);
-  const w = days.length>10 ? 'style="min-width:'+(days.length*22)+'px"' : "";
-  return `<div class="chart-scroll"><div class="chart" ${w}>`+days.map(d=>{
-    const h=Math.max(3, (d.h/max)*140);
-    const fri=d.fri?' fri':'';
-    const star=d.fri?'★ ':'';
-    return `<div class="col${fri}"><div class="val">${d.h?d.h.toFixed(d.h%1?1:0):""}</div><div class="bar" style="height:${h}px"></div><div class="lbl">${star}${d.lbl}</div></div>`;
-  }).join("")+`</div></div>`;
-}
 
 function sessCard(label, time, sub, ch){
   if(!ch){
@@ -762,101 +998,196 @@ function renderSyList(){
 }
 
 function renderTimer(){
-  const t=todayISO();
-  const shown=displayHours(t);
-  const auto=todayHoursAuto();
-  const pt=Number(partials[t]||0);
-  const s=SESSIONS.find(x=>x.id===timer.sid);
-  const r=96, circ=2*Math.PI*r;
-  const p=timer.total? timer.remain/timer.total : 0;
-  const elapsed=Math.max(0, timer.total-timer.remain);
-  const elapsedTxt = elapsed>=60 ? (elapsed/3600).toFixed(2)+" ঘণ্টা" : (elapsed? elapsed+" সেকেন্ড":"শুরু হয়নি");
-  const btns=SESSIONS.map(x=>`<button class="tbtn ${timer.sid===x.id?"on":""}" data-act="selsess" data-id="${x.id}">${x.name}<small>${x.mins} মিনিট</small></button>`).join("");
-  return `<div class="section-h"><h2>⏱ মাল্টি-সেশন টাইমার</h2><span class="chip">আজ ${shown} ঘণ্টা</span></div>
-  <div class="timer-grid">${btns}</div>
-  <div class="glass ring-wrap">
+  const plan=todayPlan(),t=dk(),tl=S.logs[t]||{};
+  const cands=[plan.m];
+  if(plan.a!==plan.m)cands.push(plan.a);
+  const labels=[ "সকাল–দুপুর", plan.friday?"AI পিক · দুর্বলতম":"দুপুর–রাত" ];
+  const sbtns=cands.map((id,i)=>`<button class="sbtn" data-act="setbook" data-b="${id}">
+      <span class="k">${labels[i]}</span><b style="color:${SUBJECTS[id].color}">${SUBJECTS[id].bn}</b><small id="tmS_${id}">আজ ${fmtHM(tl[id]||0)}</small></button>`).join("");
+  const opts=SUB_ORDER.map(id=>`<option value="${id}">${SUBJECTS[id].bn}</option>`).join("");
+  const r=96,circ=2*Math.PI*r;
+  return `<div class="section-h"><h2>⏱ ফোকাস টাইমার</h2><span class="chip" id="tmToday">আজ ${fmtHM(dayTotal(t))}</span></div>
+  <div class="timer-grid" id="tmModes">
+    <button class="tbtn" data-act="tmmode" data-m="classic">২৫ / ৫ মিনিট<small>ক্লাসিক</small></button>
+    <button class="tbtn" data-act="tmmode" data-m="deep">৫০ / ৫ মিনিট<small>ডিপ ফোকাস</small></button>
+    <button class="tbtn" data-act="tmmode" data-m="custom">কাস্টম<small>নিজের মতো</small></button>
+  </div>
+  <div class="glass cust" id="tmCust">
+    <div><label for="tmCf">ফোকাস (মিনিট)</label><input class="in" id="tmCf" type="number" min="1" max="240" inputmode="numeric" value="${S.cfg.cf}"></div>
+    <div><label for="tmCb">বিরতি (মিনিট)</label><input class="in" id="tmCb" type="number" min="1" max="60" inputmode="numeric" value="${S.cfg.cb}"></div>
+  </div>
+  <div class="glass ring-wrap" id="tmBox">
+    <div class="tm-phase" id="tmPhase">ফোকাস সেশন</div>
     <div class="ring-box">
-    <svg viewBox="0 0 220 220">
-      <circle cx="110" cy="110" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="12"/>
-      <circle id="ringFg" cx="110" cy="110" r="${r}" fill="none" stroke="url(#tg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-p)}" transform="rotate(-90 110 110)"/>
-      <defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs>
-    </svg>
-    <div class="ring-center">
-      <div class="time-big" id="timeBig">${fmtTime(timer.remain)}</div>
-      <div class="small muted">${s.name} · ${s.hrs} ঘণ্টা লগ হবে</div>
-    </div>
+      <svg viewBox="0 0 220 220">
+        <defs>
+          <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient>
+          <linearGradient id="tgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fde047"/></linearGradient>
+        </defs>
+        <circle cx="110" cy="110" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="12"/>
+        <circle id="tmRing" cx="110" cy="110" r="${r}" fill="none" stroke="url(#tg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="0" transform="rotate(-90 110 110)"/>
+      </svg>
+      <div class="ring-center">
+        <div class="time-big" id="tmClock">25:00</div>
+        <div class="small muted">এখন পড়ছি</div>
+        <div class="tm-cur" id="tmCur"></div>
+      </div>
     </div>
     <div class="t-actions">
-      ${timer.running?`<button class="btn pause" data-act="pause">⏸ পজ</button>`:`<button class="btn go" data-act="start">▶ স্টার্ট</button>`}
-      <button class="btn reset" data-act="resetT">↺ রিসেট</button>
-      <button class="btn save" data-act="savepart">💾 যতটুকু পড়েছি সেভ করো</button>
+      <button class="btn go" id="tmGo" data-act="tmgo">▶ শুরু করো</button>
+      <button class="btn save" data-act="tmstop">💾 সেভ ও থামাও</button>
+      <button class="btn skip" id="tmSkip" data-act="tmskip" style="display:none">⏭ বিরতি বাদ</button>
     </div>
-    <div class="small muted" style="margin-top:4px">চলমান সেশনে অতিবাহিত: <b style="color:#fde047">${elapsedTxt}</b></div>
+    <div class="t-actions"><button class="btn tog" id="tmWl" data-act="wl">📱 স্ক্রিন চালু রাখো: বন্ধ</button></div>
+    <div class="tm-prog">
+      <div class="row-between small"><span class="muted">আজকের লক্ষ্য · ৩০০ মিনিট</span><b id="tmTodayTxt" style="color:#a5b4fc"></b></div>
+      <div class="tbar" style="margin-top:6px"><i id="tmTodayBar" style="width:0"></i></div>
+    </div>
   </div>
-  <div class="glass hours-box">
-    <div class="row-between"><b>আজকের পড়ার ঘণ্টা</b><span class="chip">${shown} hrs</span></div>
-    <div class="small muted" style="margin-top:6px">অটো লগ (সেশন টিক/টাইমার): ${auto} ঘণ্টা + পার্শিয়াল সেভ: ${pt} ঘণ্টা = <b style="color:#a5b4fc">${(auto+pt).toFixed(2)} ঘণ্টা</b>। ম্যানুয়ালি সেট করলে সেটাই চার্টে যাবে।</div>
-    <div class="manual-row">
-      <input id="hrIn" type="number" min="0" max="24" step="0.5" value="${manual[t]!=null?manual[t]:shown}">
-      <button class="btn go" data-act="savehr">ঘণ্টা সেভ</button>
-      <button class="linkish" data-act="clearmn">অটোতে ফিরে যাও</button>
-    </div>
+  <div class="glass sub-box">
+    <div class="row-between" style="margin-bottom:10px"><b style="font-size:13.5px">আজকের বিষয় — ${DAYS_BN[plan.dow]}</b><span class="chip">${plan.note.split(" · ")[0]}</span></div>
+    <div class="sbtns" id="tmSubs">${sbtns}</div>
+    <label class="small muted" for="tmSel" style="display:block;margin-bottom:6px">অন্য বিষয়ে পড়ছো? ১৩ পত্র থেকে বেছে নাও</label>
+    <select class="in" id="tmSel">${opts}</select>
+    <div class="small muted" style="margin-top:10px;line-height:1.55">টাইমারের প্রতিটি সেকেন্ড বিষয় ধরে জমা হয়। আজকের মোট সময় ৭.৫ ঘণ্টার সেশন-ক্রম অনুযায়ী পূর্ণ হলে রুটিনের সেশন নিজে থেকেই টিক হয়ে যাবে।</div>
   </div>`;
 }
 
-function renderAnalytics(){
-  const d7=[], d30=[];
-  for(let i=6;i>=0;i--){
-    const iso=dateOffset(i);
-    const dt=new Date(iso+"T12:00:00");
-    d7.push({h:displayHours(iso), fri:isFri(iso), lbl:DAYS_SHORT[dt.getDay()]});
-  }
-  for(let i=29;i>=0;i--){
-    const iso=dateOffset(i);
-    const dt=new Date(iso+"T12:00:00");
-    d30.push({h:displayHours(iso), fri:isFri(iso), lbl:String(dt.getDate())});
-  }
-  const last7=d7.reduce((s,x)=>s+x.h,0);
-  const last30=d30.reduce((s,x)=>s+x.h,0);
-  const avg7=last7/7, avg30=last30/30;
-  let streak=0;
-  for(let i=0;i<400;i++){
-    const iso=dateOffset(i);
-    if(displayHours(iso)>0) streak++; else { if(i>0) break; }
-  }
-  const tot=totalChapters(), done=doneCount();
-  let subRows="";
-  SUB_ORDER.forEach(id=>{
-    const s=SUBJECTS[id]; const d=doneCount(id); const n=s.chapters.length;
-    subRows+=`<div style="margin:8px 0"><div class="row-between small"><span style="color:${s.color};font-weight:700">${s.bn}</span><span class="muted">${d}/${n}</span></div>
-    <div class="bar-bg"><div class="bar-fg" style="width:${Math.round(d/n*100)}%;background:${s.color}"></div></div></div>`;
-  });
-  return `
+function paintToday(){
+  const chip=$("tmToday");
+  if(!chip)return;
+  const t=dk(),tot=dayTotal(t),tl=S.logs[t]||{};
+  chip.textContent="আজ "+fmtHM(tot);
+  const tx=$("tmTodayTxt"),bar=$("tmTodayBar");
+  if(tx)tx.textContent=Math.floor(tot/60)+" / ৩০০ মি";
+  if(bar){bar.style.width=Math.min(100,tot/180)+"%";bar.className=tot>=18000?"ok":""}
+  document.querySelectorAll("#tmSubs small[id^=tmS_]").forEach(el=>{el.textContent="আজ "+fmtHM(tl[el.id.slice(4)]||0)});
+}
+
+function paintTimer(){
+  const clock=$("tmClock");
+  if(!clock||page!=="timer")return;
+  const brk=T.phase==="break",total=brk?bMs():fMs(),rem=remNow();
+  const sec=Math.ceil(rem/1000);
+  clock.textContent=pad(Math.floor(sec/60))+":"+pad(sec%60);
+  const ring=$("tmRing"),circ=2*Math.PI*96;
+  ring.style.strokeDashoffset=String(circ*(1-Math.min(1,Math.max(0,rem/total))));
+  ring.setAttribute("stroke",brk?"url(#tgb)":"url(#tg)");
+  $("tmBox").classList.toggle("brk",brk);
+  $("tmPhase").textContent=brk?"☕ বিরতির সময়":(T.running?"🎯 ফোকাস চলছে":"ফোকাস সেশন");
+  const go=$("tmGo");
+  go.textContent=T.running?"⏸ বিরতি দাও":(T.rem<total?"▶ চালিয়ে যাও":"▶ শুরু করো");
+  go.className="btn "+(T.running?"pause":"go");
+  $("tmSkip").style.display=brk?"":"none";
+  const act=activeBook(),cur=$("tmCur");
+  cur.textContent=SUBJECTS[act].bn;cur.style.color=SUBJECTS[act].color;
+  document.querySelectorAll("#tmModes .tbtn").forEach(b=>b.classList.toggle("on",b.dataset.m===S.cfg.mode));
+  $("tmCust").classList.toggle("show",S.cfg.mode==="custom");
+  document.querySelectorAll("#tmSubs .sbtn").forEach(b=>b.classList.toggle("on",b.dataset.b===act));
+  const sel=$("tmSel");if(sel&&sel.value!==act)sel.value=act;
+  const wl=$("tmWl");
+  wl.classList.toggle("on",!!S.cfg.wl);
+  wl.textContent="📱 স্ক্রিন চালু রাখো: "+(S.cfg.wl?"চালু":"বন্ধ");
+  paintToday();
+}
+
+/* ================= Analytics ================= */
+function weekInfo(){
+  const td=new Date();td.setHours(0,0,0,0);
+  const idx=(td.getDay()+1)%7;                 /* Saturday = 0 ... Friday = 6 */
+  let w=0;for(let i=0;i<=idx;i++)w+=dayTotal(dk(addDays(td,-i)));
+  const H=w/3600,n=new Date();
+  const ds=idx+(n.getHours()*60+n.getMinutes())/1440,proj=H/Math.max(ds,.5)*7;
+  let txt,col;
+  if(H>=80){txt="🏆 Elite Target Achieved!";col="var(--ok)"}
+  else if(H>=70){txt="✅ Minimum Goal Hit — push for 80h!";col="var(--ok)"}
+  else if(proj>=80){txt="On Track for 80h! 🚀";col="var(--ok)"}
+  else if(proj>=70){txt="On Track for 70h 👍";col="var(--cyan)"}
+  else{txt="Behind Pace — গতি বাড়াও! ⚡";col="var(--gold)"}
+  return {w,H,txt,col};
+}
+function anTopHTML(){
+  const t=dayTotal(dk()),left=Math.max(0,300-Math.floor(t/60)),wk=weekInfo(),H=wk.H;
+  return `<div class="glass an-card">
+    <div class="row-between"><div class="small muted">দৈনিক স্ট্রিক · ৫ ঘণ্টা (৩০০ মিনিট)</div><span class="chip gold" style="font-size:13px;font-weight:800">🔥 ${streakCount()} Days</span></div>
+    <div class="tbar" style="margin-top:10px"><i class="${t>=18000?"ok":""}" style="width:${Math.min(100,t/180)}%"></i></div>
+    <div class="small muted" style="margin-top:6px">${left>0?`স্ট্রিক ধরে রাখতে আর ${left} মিনিট বাকি (আজ ${Math.floor(t/60)}/৩০০ মিনিট)`:"✅ আজকের ৫ ঘণ্টার স্ট্রিক লক্ষ্য পূর্ণ! দারুণ!"}</div>
+  </div>
   <div class="stats">
-    <div class="glass stat"><b>${avg7.toFixed(1)}</b><span>৭ দিনের গড় ঘণ্টা</span></div>
-    <div class="glass stat"><b>${avg30.toFixed(1)}</b><span>৩০ দিনের গড়</span></div>
-    <div class="glass stat"><b>${streak}</b><span>স্ট্রিক (দিন)</span></div>
+    <div class="glass stat t"><b>${fmtHM(t)}</b><span>আজকের পড়া</span></div>
+    <div class="glass stat t"><b>${fmtHM(rangeTotal(7))}</b><span>গত ৭ দিন</span></div>
+    <div class="glass stat t"><b>${fmtHM(rangeTotal(30))}</b><span>গত ৩০ দিন</span></div>
   </div>
-  <div class="glass chart-card">
-    <h3>📊 গত ৭ দিনের পড়াশোনা</h3>
-    ${renderChart(d7)}
-    <div class="legend"><span><i class="dot" style="background:#818cf8"></i>সাধারণ দিন</span><span><i class="dot" style="background:#f59e0b"></i>শুক্রবার ★ রিভিশন/মডেল টেস্ট</span></div>
+  <div class="glass an-card">
+    <h2>🎯 এই সপ্তাহের লক্ষ্য: ৭০–৮০ ঘণ্টা</h2>
+    <div class="wgoal"><i class="${H>=70?"ok":""}" style="width:${Math.min(100,wk.w/288000*100)}%"></i><u></u></div>
+    <div class="gl"><span>0h</span><span>70h (মিনিমাম)</span><span>80h</span></div>
+    <div class="small muted" style="margin-top:8px;line-height:1.55">সম্পন্ন ${H.toFixed(1)}h (৭০ঘ-এর ${(H/70*100).toFixed(1)}% • ৮০ঘ-এর ${(H/80*100).toFixed(1)}%) • ৭০ঘ-এ পৌঁছাতে ${Math.max(0,70-H).toFixed(1)}h, ৮০ঘ-এ ${Math.max(0,80-H).toFixed(1)}h বাকি · সপ্তাহ শনি–শুক্র</div>
+    <span class="status" style="color:${wk.col};border-color:${wk.col}">${wk.txt}</span>
+  </div>`;
+}
+function anDailyHTML(){
+  const td=new Date(),rows=[];let mx=18000;
+  for(let i=0;i<30;i++){const d=addDays(td,-i),v=dayTotal(dk(d));rows.push([d,v]);mx=Math.max(mx,v)}
+  return rows.map(([d,v])=>{
+    let lb;try{lb=d.toLocaleDateString("bn-BD",{weekday:"short",day:"numeric",month:"short"})}catch(e){lb=dk(d)}
+    const hit=v>=18000;
+    return `<div class="li ${hit?"hit":""}"><span>${lb}</span><div class="tbar"><i class="${hit?"ok":""}" style="width:${v/mx*100}%"></i></div><span class="n">${fmtHM(v)}</span></div>`;
+  }).join("");
+}
+function anSubjHTML(){
+  const tot={};let unatt=0;
+  const dates=new Set([...Object.keys(S.logs),...Object.keys(hours),...Object.keys(partials),...Object.keys(manual)]);
+  dates.forEach(d=>{
+    const l=S.logs[d]||{};
+    for(const b in l)tot[b]=(tot[b]||0)+l[b];
+    unatt+=Math.max(0,dayTotal(d)-logSum(d));
+  });
+  const smx=Math.max(3600,...SUB_ORDER.map(id=>tot[id]||0));
+  let html=SUB_ORDER.map(id=>{
+    const s=SUBJECTS[id],v=tot[id]||0,d=doneCount(id),n=s.chapters.length,p=Math.round(d/n*100);
+    return `<div class="sj-row">
+      <div class="row-between small"><span style="color:${s.color};font-weight:800">${s.bn}</span><span class="n">⏱ ${fmtHM(v)}</span></div>
+      <div class="tbar"><i style="width:${v/smx*100}%;background:${s.color}"></i></div>
+      <div class="row-between small muted"><span>✅ অধ্যায় ${d}/${n}</span><span>${p}%</span></div>
+      <div class="bar-bg" style="margin-top:4px"><div class="bar-fg" style="width:${p}%;background:${s.color}"></div></div>
+    </div>`;
+  }).join("");
+  const rev=tot.rev||0;
+  if(rev>0)html+=`<div class="sj-row"><div class="row-between small"><span>সাপ্তাহিক রিভিশন (পুরোনো লগ)</span><span class="n">⏱ ${fmtHM(rev)}</span></div></div>`;
+  if(unatt>=60)html+=`<div class="sj-row"><div class="row-between small"><span>বিষয় ছাড়া (রুটিন টিক / পুরোনো ঘণ্টা)</span><span class="n">⏱ ${fmtHM(unatt)}</span></div></div>`;
+  return html;
+}
+function renderAnalytics(){
+  const q=QUOTES[quoteIdx%QUOTES.length],tot=totalChapters(),done=doneCount();
+  return `<div class="section-h" style="margin-top:4px"><h2>📊 অ্যানালিটিক্স ও রিপোর্ট</h2><span class="chip ok">অধ্যায় ${Math.round(done/tot*100)}%</span></div>
+  <div id="anTop">${anTopHTML()}</div>
+  <div class="glass an-card"><h2>📅 দৈনিক পড়ার তালিকা (৩০ দিন)</h2><div class="small muted" style="margin:-4px 0 8px">সবুজ = ৫ ঘণ্টা (৩০০ মিনিট) লক্ষ্য পূর্ণ</div><div class="scroll" id="anDl">${anDailyHTML()}</div></div>
+  <div class="glass an-card"><h2>📚 বই অনুযায়ী মোট সময় ও পত্রভিত্তিক অগ্রগতি</h2><div class="small muted" style="margin:-4px 0 4px">বই অনুযায়ী মোট সময় (⏱) এবং পত্রভিত্তিক অধ্যায় অগ্রগতি (✅) — ১৩ পত্র</div><div class="scroll" id="anSj" style="max-height:none">${anSubjHTML()}</div></div>
+  <div class="glass an-card">
+    <h2>💾 ব্যাকআপ ও রিস্টোর</h2>
+    <div class="bk-row">
+      <button class="btn plain" data-act="exp">⬇ Export Backup (JSON)</button>
+      <button class="btn plain" data-act="imp">⬆ Import Backup</button>
+    </div>
+    <input type="file" id="impFile" accept="application/json,.json" hidden>
+    <div class="small muted" style="margin-top:10px;line-height:1.55">অধ্যায়, রুটিন ও সেকেন্ড-ভিত্তিক সব পড়ার লগ ব্যাকআপে থাকে। সব ডেটা শুধু তোমার ডিভাইসে সেভ থাকে — নিয়মিত ব্যাকআপ নাও।</div>
   </div>
-  <div class="glass chart-card">
-    <h3>📈 গত ৩০ দিন</h3>
-    ${renderChart(d30)}
-    <div class="small muted" style="margin-top:8px">মোট ${last30.toFixed(1)} ঘণ্টা · শুক্রবারগুলো সোনালি বারে চিহ্নিত</div>
-  </div>
-  <div class="glass" style="padding:14px">
-    <div class="section-h" style="margin-top:0"><h2>পত্রভিত্তিক অগ্রগতি</h2><span class="chip">${Math.round(done/tot*100)}%</span></div>
-    ${subRows}
-  </div>
-  <div class="glass quote-banner" style="margin-top:12px" data-act="nextq">
-    <q>${QUOTES[quoteIdx%QUOTES.length].q}</q>
-    <div class="who">— ${QUOTES[quoteIdx%QUOTES.length].w}</div>
+  <div class="glass quote-banner" data-act="nextq">
+    <q>${q.q}</q>
+    <div class="who">— ${q.w}</div>
     <div class="hint">ট্যাপ করো পরের উক্তি</div>
   </div>`;
 }
+function refreshAnalytics(){
+  const top=$("anTop"),dl=$("anDl"),sj=$("anSj");
+  if(!top||!dl||!sj)return;
+  top.innerHTML=anTopHTML();
+  const a=dl.scrollTop,b=sj.scrollTop;
+  dl.innerHTML=anDailyHTML();sj.innerHTML=anSubjHTML();
+  dl.scrollTop=a;sj.scrollTop=b;
+}
+
 
 function navBar(){
   const items=[["home","হোম","home"],["routine","রুটিন","list"],["syllabus","সিলেবাস","book"],["timer","টাইমার","timer"],["analytics","চার্ট","chart"]];
@@ -870,6 +1201,7 @@ function render(animate){
   pv.className = animate ? "page anim" : "page";
   pv.innerHTML = pages[page]();
   nv.innerHTML = navBar();
+  if(page==="timer") paintTimer();
 
   const sy=document.getElementById("sySearch");
   if(sy){
@@ -895,21 +1227,19 @@ document.getElementById("app").addEventListener("click", e=>{
     refreshSyList();
   }
   else if(act==="nextq"){ quoteIdx=(quoteIdx+1)%QUOTES.length; updateQuoteDOM(); }
-  else if(act==="selsess") selectSession(b.dataset.id);
-  else if(act==="savepart") savePartial();
-  else if(act==="start") startTimer();
-  else if(act==="pause") pauseTimer();
-  else if(act==="resetT") resetTimer();
-  else if(act==="savehr"){
-    const v=document.getElementById("hrIn").value;
-    const t=todayISO();
-    manual[t]=Number(v); persistHr(); toast("আজকের ঘণ্টা সেভ হয়েছে: "+v); render(false);
-  }
-  else if(act==="clearmn"){ delete manual[todayISO()]; persistHr(); render(false); }
+  else if(act==="tmmode") setMode(b.dataset.m);
+  else if(act==="tmgo"){ if(T.running) pauseT(); else startT(); }
+  else if(act==="tmstop") saveStop();
+  else if(act==="tmskip") skipBreak();
+  else if(act==="setbook") setBook(b.dataset.b);
+  else if(act==="wl") toggleWL();
+  else if(act==="exp") exportBackup();
+  else if(act==="imp"){ const f=$("impFile"); if(f) f.click(); }
   else if(act==="install") installApp();
   else if(act==="reset"){
-    if(confirm("সব অধ্যায়, রুটিন ও ঘণ্টার ডেটা মুছে যাবে। নিশ্চিত?")){
+    if(confirm("সব অধ্যায়, রুটিন, টাইমার ও পড়ার লগ মুছে যাবে। নিশ্চিত?")){
       chapters={}; routine={}; hours={}; logged={}; manual={}; partials={};
+      relWL(); S=normS({cfg:S.cfg}); initTimer(); saveS();
       persistCh(); persistRt(); persistHr(); toast("রিসেট সম্পন্ন"); render(false);
     }
   }
@@ -947,8 +1277,8 @@ async function setupPWA(){
     name:"রকির AI স্টাডি গাইডার",
     short_name:"Rocky HSC",
     description:"HSC 2027 Humanities study guider & analytics for Rocky, Bogura.",
-    start_url:"./",
-    scope:"./",
+    start_url:location.origin+location.pathname,
+    scope:location.origin+location.pathname.replace(/[^/]*$/,""),
     display:"standalone",
     orientation:"portrait",
     background_color:"#070b14",
@@ -963,32 +1293,8 @@ async function setupPWA(){
   const link=document.createElement("link"); link.rel="manifest"; link.href=mUrl; document.head.appendChild(link);
   const apple=document.createElement("link"); apple.rel="apple-touch-icon"; apple.href=icon192; document.head.appendChild(apple);
 
-  const swJS = `
-    const CACHE='rocky-hsc-v2';
-    self.addEventListener('install', e => {
-      self.skipWaiting();
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./','./index.html']).catch(()=>{})));
-    });
-    self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        fetch(e.request).then(res => {
-          const copy=res.clone();
-          caches.open(CACHE).then(c => { try{ c.put(e.request, copy); }catch(err){} });
-          return res;
-        }).catch(() => caches.match(e.request).then(r => r || caches.match('./') || caches.match('./index.html')))
-      );
-    });
-  `;
-  if("serviceWorker" in navigator){
-    try{
-      const swUrl=URL.createObjectURL(new Blob([swJS],{type:"application/javascript"}));
-      await navigator.serviceWorker.register(swUrl,{scope:"./"});
-    }catch(err){
-      try{
-        await navigator.serviceWorker.register("data:application/javascript,"+encodeURIComponent(swJS));
-      }catch(e2){}
-    }
+  if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+    try{ await navigator.serviceWorker.register("sw.js"); }catch(err){}
   }
 }
 function installApp(){
@@ -1002,8 +1308,25 @@ function installApp(){
 }
 window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredPrompt=e; });
 
+/* ---- change events (select / custom inputs / file import) ---- */
+document.getElementById("app").addEventListener("change", e=>{
+  const id=e.target.id;
+  if(id==="tmSel") setBook(e.target.value);
+  else if(id==="tmCf"||id==="tmCb") applyCustom();
+  else if(id==="impFile"){ const f=e.target.files[0]; if(f) importBackup(f); e.target.value=""; }
+});
+/* ---- lifecycle: never lose seconds when the screen locks / app is backgrounded ---- */
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState==="visible"){ tick(); reqWL(); }
+  else { flushPend(); persistTimer(); }
+});
+window.addEventListener("pagehide", ()=>{ flushPend(); persistTimer(); });
+
+loadS(); initTimer();
 setupPWA();
 render(true);
+tick();
+setInterval(tick, 500);
 })();
 </script>
 </body>
