@@ -1,7 +1,7 @@
 /* রকির AI স্টাডি গাইডার — offline PWA service worker
    Strategy: cache-first for instant/offline start + background refresh (stale-while-revalidate).
    Bump CACHE whenever index.html changes so old copies are purged. */
-const CACHE='rocky-hsc-study-v3';
+const CACHE='rocky-hsc-study-v5';
 const CORE=['./','./index.html'];
 
 self.addEventListener('install',e=>{
