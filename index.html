@@ -251,6 +251,14 @@ hr.sep{border:0;border-top:1px solid rgba(255,255,255,.06);margin:10px 0}
   from{box-shadow:0 0 calc(6px + 14px*var(--urgency)) rgba(239,68,68,calc(.12 + .2*var(--urgency)))}
   to{box-shadow:0 0 calc(14px + 34px*var(--urgency)) rgba(249,115,22,calc(.25 + .5*var(--urgency)))}}
 @media (prefers-reduced-motion:reduce){.fire,.fire::before,.fire::after,.fire .fs,[data-theme="test"] .cd-wrap{animation:none!important}}
+/* ---- background alarm banner ---- */
+.alarm-bar{position:fixed;left:0;right:0;top:0;z-index:80;display:none;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.55);animation:alPulse 1s ease-in-out infinite}
+.alarm-bar.show{display:flex}
+.alarm-bar b{display:block;font-size:13.5px;line-height:1.3}
+.alarm-bar span{display:block;font-size:11.5px;opacity:.92;margin-top:2px}
+.alarm-bar button{flex-shrink:0;border:0;border-radius:12px;padding:11px 14px;font-weight:800;font-size:13px;font-family:inherit;background:#fff;color:#111;cursor:pointer}
+.alarm-bar button:active{transform:scale(.97)}
+@keyframes alPulse{50%{filter:brightness(1.25)}}
 </style>
 </head>
 <body>
@@ -743,7 +751,7 @@ function initTimer(){
   }
   if(T.running&&!(T.endAt>0&&T.last>0))T.running=false;
 }
-function persistTimer(){S.timer=Object.assign({},T);saveS()}
+function persistTimer(){S.timer=Object.assign({},T);saveS();keepSync()}
 function flushPend(){
   if(!T)return;
   if(T.running&&T.phase==="focus"){
@@ -807,15 +815,191 @@ function chime(){
     if(navigator.vibrate)navigator.vibrate([300,150,300,150,600]);
   }catch(e){}
 }
-function phaseEnd(loud){
+/* ================= Background alarm engine =================
+   Layer 1: HTML5 <audio> alarm (WAV data URI, looping) — mobile OSes keep <audio> alive, unlike AudioContext
+   Layer 2: near-silent <audio> heartbeat while the timer runs — keeps the tab un-throttled in the background
+   Layer 3: Web Worker ticker + exact setTimeout at endAt + catch-up in tick()/visibilitychange
+   Layer 4: system notification via the service worker (sound + vibration even on a locked screen) */
+var alarmA=null,keepA=null,ALARM_SRC="",SILENT_SRC="";
+var alarmOn=false,keepSwapped=false,vibTm=null,autoTm=null,endTm=null,keepTry=0;
+const ALARM_MAX_MS=180000;                 /* ring for at most 3 minutes unless stopped */
+
+function wavURI(rate,secs,gen){
+  const n=Math.floor(rate*secs),buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
+  const ws=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};
+  ws(0,"RIFF");v.setUint32(4,36+n*2,true);ws(8,"WAVE");ws(12,"fmt ");
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,rate,true);v.setUint32(28,rate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+  ws(36,"data");v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++){
+    const x=Math.max(-1,Math.min(1,gen(i/rate)));
+    v.setInt16(44+i*2,Math.round(x*32767),true);
+  }
+  const u=new Uint8Array(buf);let bin="";
+  for(let i=0;i<u.length;i+=0x8000)bin+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));
+  return "data:audio/wav;base64,"+btoa(bin);
+}
+function alarmSrc(){
+  if(!ALARM_SRC){
+    const notes=[784,988,1175,1568],PER=1.4;            /* 3 chime rounds of 1.4s = 4.2s loop */
+    ALARM_SRC=wavURI(22050,PER*3,t=>{
+      const lt=t%PER;let x=0;
+      notes.forEach((f,i)=>{
+        const dt=lt-i*.18;
+        if(dt<0)return;
+        const env=Math.min(1,dt/.012)*Math.exp(-dt*4.5);
+        x+=env*(Math.sin(2*Math.PI*f*dt)+.3*Math.sin(4*Math.PI*f*dt));
+      });
+      return x*.42;
+    });
+  }
+  return ALARM_SRC;
+}
+function silentSrc(){
+  if(!SILENT_SRC)SILENT_SRC=wavURI(8000,1,t=>(Math.floor(t*8000)%2?1:-1)*.00006);   /* ±2/32768 ≈ inaudible */
+  return SILENT_SRC;
+}
+function alarmEl(){
+  if(!alarmA){alarmA=new Audio();alarmA.preload="auto";alarmA.loop=true;alarmA.setAttribute("playsinline","");alarmA.src=alarmSrc()}
+  return alarmA;
+}
+function keepEl(){
+  if(!keepA){keepA=new Audio();keepA.preload="auto";keepA.loop=true;keepA.volume=.02;keepA.setAttribute("playsinline","");keepA.src=silentSrc()}
+  return keepA;
+}
+/* call from a user gesture (Start button): unlocks <audio> playback for later, gesture-free alarms */
+function unlockAudio(){
+  actx();
+  try{
+    const a=alarmEl();
+    if(!alarmOn){
+      a.muted=true;
+      const p=a.play();
+      const done=()=>{if(!alarmOn){try{a.pause();a.currentTime=0}catch(e){}}a.muted=false};
+      if(p&&p.then)p.then(done).catch(()=>{a.muted=false});else done();
+    }
+    keepTry=0;keepSync();
+  }catch(e){}
+}
+function setMedia(){
+  try{
+    if("mediaSession" in navigator&&window.MediaMetadata){
+      navigator.mediaSession.metadata=new MediaMetadata({title:"ফোকাস টাইমার চলছে",artist:"রকির AI স্টাডি গাইডার"});
+      navigator.mediaSession.playbackState="playing";
+    }
+  }catch(e){}
+}
+/* keep-alive heartbeat + exact end timer; runs after every timer state change */
+function keepSync(){
+  try{
+    clearTimeout(endTm);
+    if(T&&T.running){
+      const k=keepEl();
+      if(k.paused&&!keepSwapped&&Date.now()-keepTry>2500){
+        keepTry=Date.now();
+        const p=k.play();if(p&&p.catch)p.catch(()=>{});
+        setMedia();
+      }
+      endTm=setTimeout(tick,Math.min(2147000000,Math.max(0,T.endAt-Date.now())+30));
+    }else{
+      keepTry=0;
+      if(keepA&&!keepSwapped&&!keepA.paused)keepA.pause();
+      try{if("mediaSession" in navigator)navigator.mediaSession.playbackState="none"}catch(e){}
+    }
+  }catch(e){}
+}
+function ensureAlarmBar(){
+  let el=document.getElementById("alarmBar");
+  if(!el){
+    el=document.createElement("div");el.id="alarmBar";el.className="alarm-bar";
+    el.setAttribute("role","alert");
+    el.innerHTML='<div><b id="alarmTitle"></b><span id="alarmBody"></span></div><button type="button" id="alarmStop">🔔 অ্যালার্ম থামাও</button>';
+    document.body.appendChild(el);
+    el.querySelector("#alarmStop").addEventListener("click",stopAlarm);
+  }
+  return el;
+}
+function sysNotify(title,body){
+  try{
+    if(!("Notification" in window)||Notification.permission!=="granted"||!navigator.serviceWorker)return;
+    navigator.serviceWorker.ready.then(reg=>reg.showNotification(title,{
+      body:body,tag:"rocky-timer",renotify:true,requireInteraction:true,silent:false,
+      vibrate:[400,150,400,150,600],lang:"bn-BD",data:{url:"./"}
+    })).catch(()=>{});
+  }catch(e){}
+}
+function closeNotif(){
+  try{
+    if(!navigator.serviceWorker)return;
+    navigator.serviceWorker.ready
+      .then(reg=>reg.getNotifications({tag:"rocky-timer"}))
+      .then(list=>list.forEach(n=>n.close()))
+      .catch(()=>{});
+  }catch(e){}
+}
+function askNotifPermission(){
+  try{
+    if(!("Notification" in window)||Notification.permission!=="default")return;
+    const r=Notification.requestPermission(res=>{if(res==="denied")toast("নোটিফিকেশন বন্ধ — স্ক্রিন বন্ধ থাকলে শুধু অ্যালার্ম সাউন্ডের ওপর ভরসা করতে হবে")});
+    if(r&&r.then)r.then(res=>{if(res==="denied")toast("নোটিফিকেশন বন্ধ — স্ক্রিন বন্ধ থাকলে শুধু অ্যালার্ম সাউন্ডের ওপর ভরসা করতে হবে")}).catch(()=>{});
+  }catch(e){}
+}
+function vibrateNow(){try{if(navigator.vibrate)navigator.vibrate([400,150,400,150,600])}catch(e){}}
+function ringAlarm(title,body){
+  const bar=ensureAlarmBar();
+  bar.querySelector("#alarmTitle").textContent=title;
+  bar.querySelector("#alarmBody").textContent=body;
+  bar.classList.add("show");
+  if(!alarmOn){
+    alarmOn=true;
+    try{
+      const a=alarmEl();a.loop=true;a.muted=false;a.volume=1;
+      try{a.currentTime=0}catch(e){}
+      const p=a.play();
+      if(p&&p.catch)p.catch(()=>{
+        /* fallback: re-use the already-playing heartbeat element, else the AudioContext chime */
+        try{
+          if(keepA&&!keepA.paused){
+            keepSwapped=true;keepA.src=alarmSrc();keepA.loop=true;keepA.volume=1;
+            const q=keepA.play();if(q&&q.catch)q.catch(()=>chime());
+          }else chime();
+        }catch(e){chime()}
+      });
+    }catch(e){chime()}
+    vibrateNow();
+    clearInterval(vibTm);vibTm=setInterval(vibrateNow,4200);
+    clearTimeout(autoTm);autoTm=setTimeout(stopAlarm,ALARM_MAX_MS);
+  }
+  sysNotify(title,body);
+}
+function stopAlarm(){
+  const was=alarmOn;
+  alarmOn=false;
+  clearInterval(vibTm);clearTimeout(autoTm);
+  try{if(alarmA){alarmA.pause();alarmA.currentTime=0}}catch(e){}
+  try{
+    if(keepSwapped){keepA.pause();keepA.src=silentSrc();keepA.loop=true;keepA.volume=.02;keepSwapped=false}
+  }catch(e){keepSwapped=false}
+  try{if(navigator.vibrate)navigator.vibrate(0)}catch(e){}
+  const el=document.getElementById("alarmBar");
+  if(el)el.classList.remove("show");
+  if(was)closeNotif();
+  keepSync();
+}
+
+/* the phase has ended — ALWAYS ring (live, or catching up after the screen was off) */
+function phaseEnd(){
   if(T.phase==="focus"){
     flushPend();T.pend=0;
     const st=Math.min(Date.now(),T.endAt);           /* break starts when focus really ended */
     T.phase="break";T.rem=bMs();T.endAt=st+T.rem;T.last=st;T.running=true;
-    if(loud){chime();toast("🎉 ফোকাস শেষ! এবার "+Math.round(T.rem/60000)+" মিনিট বিরতি নাও।")}
+    const m=Math.round(T.rem/60000);
+    toast("🎉 ফোকাস শেষ! এবার "+m+" মিনিট বিরতি নাও।");
+    ringAlarm("🎉 ফোকাস শেষ!","এবার "+m+" মিনিট বিরতি নাও।");
   }else{
     T.phase="focus";T.rem=fMs();T.running=false;T.endAt=0;T.last=0;T.sess=0;
-    if(loud){chime();toast("☕ বিরতি শেষ! আবার শুরু করো।")}
+    toast("☕ বিরতি শেষ! আবার শুরু করো।");
+    ringAlarm("☕ বিরতি শেষ!","আবার পড়তে বসো — শুরু করো।");
     relWL();
   }
   persistTimer();
@@ -824,7 +1008,7 @@ function tick(){
   if(T&&T.running){
     if(T.phase==="focus")flushPend();
     let guard=0;
-    while(T.running&&Date.now()>=T.endAt&&guard++<3)phaseEnd(Date.now()-T.endAt<8000);
+    while(T.running&&Date.now()>=T.endAt&&guard++<3)phaseEnd();
   }
   paintTitle();
   if(page==="timer")paintTimer();
@@ -836,7 +1020,9 @@ function tick(){
   }
 }
 function startT(){
-  actx();
+  stopAlarm();                 /* silence any ringing alarm first */
+  unlockAudio();               /* AudioContext + <audio> unlock, inside the user's tap */
+  askNotifPermission();        /* first start only: asks once while permission is "default" */
   if(T.running)return;
   const now=Date.now();
   T.endAt=now+T.rem;T.last=now;T.running=true;
@@ -1516,9 +1702,19 @@ document.getElementById("app").addEventListener("change", e=>{
 });
 /* ---- lifecycle: never lose seconds when the screen locks / app is backgrounded ---- */
 document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState==="visible"){ tick(); reqWL(); }
+  if(document.visibilityState==="visible"){ tick(); reqWL(); keepSync(); }
   else { flushPend(); persistTimer(); }
 });
+window.addEventListener("pageshow", ()=>{ tick(); keepSync(); });
+window.addEventListener("focus", ()=>{ tick(); });
+/* after a reload the heartbeat needs one tap to be allowed to play again */
+document.addEventListener("pointerdown", ()=>{ if(T&&T.running){ keepTry=0; keepSync(); } }, {passive:true});
+/* tapping the system notification focuses the app and stops the alarm */
+try{
+  if(navigator.serviceWorker)navigator.serviceWorker.addEventListener("message", e=>{
+    if(e.data&&e.data.type==="rocky-stop-alarm"){ stopAlarm(); tick(); }
+  });
+}catch(e){}
 window.addEventListener("pagehide", ()=>{ flushPend(); persistTimer(); });
 
 loadS(); initTimer();
@@ -1527,6 +1723,11 @@ setupPWA();
 render(true);
 tick();
 setInterval(tick, 500);
+/* Web Worker ticker: workers are throttled far less than page timers while the tab is in the background */
+try{
+  const wk=new Worker(URL.createObjectURL(new Blob(["setInterval(function(){postMessage(1)},1000)"],{type:"text/javascript"})));
+  wk.onmessage=()=>{ if(T&&T.running)tick(); };
+}catch(e){}
 })();
 </script>
 </body>
