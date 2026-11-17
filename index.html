@@ -259,6 +259,24 @@ hr.sep{border:0;border-top:1px solid rgba(255,255,255,.06);margin:10px 0}
 .alarm-bar button{flex-shrink:0;border:0;border-radius:12px;padding:11px 14px;font-weight:800;font-size:13px;font-family:inherit;background:#fff;color:#111;cursor:pointer}
 .alarm-bar button:active{transform:scale(.97)}
 @keyframes alPulse{50%{filter:brightness(1.25)}}
+/* ---- fullscreen AMOLED floating timer ---- */
+.btn.fsbtn{background:rgba(255,255,255,.05);border:1px solid var(--stroke);width:100%;letter-spacing:.2px}
+.fs-ov{position:fixed;left:0;top:0;right:0;bottom:0;z-index:70;display:none;background:#000;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.fs-ov.show{display:block}
+.fs-float{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:flex-start;gap:calc(var(--c,14px)*1);will-change:transform;width:max-content}
+.fs-card{box-sizing:border-box;background:#000;border:1.5px solid #262626;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--c,14px)*.9);height:calc(var(--c,14px)*12);width:calc(var(--c,14px)*12)}
+.fs-card.wide{width:calc(var(--c,14px)*21)}
+.fs-digits{display:flex;align-items:center;justify-content:center;gap:calc(var(--c,14px)*1)}
+.fs-digits svg{display:block;height:calc(var(--c,14px)*5);shape-rendering:crispEdges}
+.fs-digits .d{width:calc(var(--c,14px)*3)}
+.fs-digits .k{width:calc(var(--c,14px)*1)}
+.fs-digits .d rect{fill:#6b7280}
+.fs-digits .k rect{fill:#4b5563}
+.fs-lbl{font-size:calc(var(--c,14px)*1.05);font-weight:700;letter-spacing:.28em;text-indent:.28em;color:#9ca3af;opacity:.7;line-height:1;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.fs-stat{width:0;min-width:100%;box-sizing:border-box;padding:0 calc(var(--c,14px)*.5);font-size:calc(var(--c,14px)*.95);font-weight:600;line-height:1.4;color:#6b7280;opacity:.55}
+.fs-hint{position:absolute;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);font-size:11px;color:#6b7280;opacity:.4;transition:opacity 1.2s ease;pointer-events:none}
+.fs-hint.off{opacity:0}
+html.fs-on .fire,html.fs-on .orbs,html.fs-on .nav{display:none!important}
 </style>
 </head>
 <body>
@@ -1011,6 +1029,7 @@ function tick(){
     while(T.running&&Date.now()>=T.endAt&&guard++<3)phaseEnd();
   }
   paintTitle();
+  if(fsOn)paintFs();
   if(page==="timer")paintTimer();
   const sig=Math.floor(dayTotal(dk())/60);
   if(sig!==lastMin){
@@ -1080,6 +1099,156 @@ function toggleWL(){
   if(S.cfg.wl)reqWL();else relWL();
   paintTimer();
 }
+
+/* ================= Fullscreen AMOLED floating timer ================= */
+var fsOn=false,fsEntered=false,fsRaf=0,fsLast=0,fsX=0,fsY=0,fsVx=.42,fsVy=.36,fsOpenAt=0,fsHintTm=null,fsWlk=null,fsPrevTheme=null,fsSig="";
+const FS_FONT={
+  "0":["111","101","101","101","111"],"1":["010","110","010","010","111"],
+  "2":["111","001","111","100","111"],"3":["111","001","111","001","111"],
+  "4":["101","101","111","001","001"],"5":["111","100","111","001","111"],
+  "6":["111","100","111","101","111"],"7":["111","001","001","001","001"],
+  "8":["111","101","111","101","111"],"9":["111","101","111","001","111"]
+};
+function fsDigit(ch){
+  const g=FS_FONT[ch]||FS_FONT["0"];let r="";
+  for(let y=0;y<5;y++)for(let x=0;x<3;x++)if(g[y][x]==="1")r+='<rect x="'+(x+.03)+'" y="'+(y+.03)+'" width=".94" height=".94"/>';
+  return '<svg class="d" viewBox="0 0 3 5" aria-hidden="true">'+r+'</svg>';
+}
+function fsColon(){
+  return '<svg class="k" viewBox="0 0 1 5" aria-hidden="true"><rect x=".03" y="1.03" width=".94" height=".94"/><rect x=".03" y="3.03" width=".94" height=".94"/></svg>';
+}
+function fsEls(){
+  let ov=document.getElementById("fsOverlay");
+  if(!ov){
+    ov=document.createElement("div");ov.id="fsOverlay";ov.className="fs-ov";
+    ov.setAttribute("role","button");ov.setAttribute("aria-label","স্ক্রিনে ট্যাপ করলে বের হবে");
+    ov.innerHTML='<div class="fs-float" id="fsFloat">'+
+      '<div class="fs-card wide" id="fsTop"><div class="fs-digits" id="fsTopD"></div><div class="fs-lbl" id="fsTopL">HR : MIN</div></div>'+
+      '<div class="fs-card" id="fsSec"><div class="fs-digits" id="fsSecD"></div><div class="fs-lbl">SEC</div></div>'+
+      '<div class="fs-stat" id="fsStat"></div></div>'+
+      '<div class="fs-hint" id="fsHint">স্ক্রিনে ট্যাপ করলে বের হবে</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener("click",()=>{ if(Date.now()-fsOpenAt>500)closeFS(); });
+  }
+  return ov;
+}
+function paintFs(){
+  const s=Math.max(0,Math.ceil(remNow()/1000)),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;
+  const hourMode=s>=3600,brk=T.phase==="break";
+  const sub=SUBJECTS[activeBook()].bn;
+  const stat=brk?"☕ "+sub+" · বিরতি চলছে":(T.running?"🎯 "+sub+" · ফোকাস চলছে":(T.rem<fMs()?"⏸ "+sub+" · বিরতি দেওয়া আছে":"▶ "+sub+" · শুরু হয়নি"));
+  const sig=(hourMode?"H":"M")+pad(hourMode?h:m)+(hourMode?pad(m):"")+"|"+pad(sc)+"|"+stat;
+  if(sig===fsSig)return;
+  fsSig=sig;
+  const top=document.getElementById("fsTop");
+  if(!top)return;
+  top.classList.toggle("wide",hourMode);
+  const td=document.getElementById("fsTopD"),sd=document.getElementById("fsSecD");
+  if(hourMode){
+    const a=pad(h),b=pad(m);
+    td.innerHTML=fsDigit(a[0])+fsDigit(a[1])+fsColon()+fsDigit(b[0])+fsDigit(b[1]);
+    document.getElementById("fsTopL").textContent="HR : MIN";
+  }else{
+    const a=pad(m);
+    td.innerHTML=fsDigit(a[0])+fsDigit(a[1]);
+    document.getElementById("fsTopL").textContent="MIN";
+  }
+  const c=pad(sc);
+  sd.innerHTML=fsDigit(c[0])+fsDigit(c[1]);
+  document.getElementById("fsStat").textContent=stat;
+}
+function fsSize(){
+  const ov=document.getElementById("fsOverlay");if(!ov)return;
+  const W=ov.clientWidth||window.innerWidth,H=ov.clientHeight||window.innerHeight;
+  /* layout is ~21 cells wide and ~28.5 cells tall: fit both orientations */
+  const c=Math.max(5,Math.min(22,Math.min(W*.92/21,H*.92/28.5)));
+  ov.style.setProperty("--c",c.toFixed(2)+"px");
+}
+function fsLoop(ts){
+  if(!fsOn)return;
+  const ov=document.getElementById("fsOverlay"),el=document.getElementById("fsFloat");
+  if(ov&&el){
+    const dt=Math.min(50,fsLast?ts-fsLast:16.67),k=dt/16.667;fsLast=ts;
+    const W=ov.clientWidth,H=ov.clientHeight,w=el.offsetWidth,h=el.offsetHeight;
+    fsX+=fsVx*k;fsY+=fsVy*k;
+    const mx=Math.max(0,W-w),my=Math.max(0,H-h);
+    if(fsX<=0){fsX=0;fsVx=Math.abs(fsVx)}else if(fsX>=mx){fsX=mx;fsVx=-Math.abs(fsVx)}
+    if(fsY<=0){fsY=0;fsVy=Math.abs(fsVy)}else if(fsY>=my){fsY=my;fsVy=-Math.abs(fsVy)}
+    el.style.transform="translate3d("+fsX.toFixed(2)+"px,"+fsY.toFixed(2)+"px,0)";
+  }
+  fsRaf=requestAnimationFrame(fsLoop);
+}
+async function fsLock(){
+  if(!fsOn||!("wakeLock" in navigator))return;
+  try{
+    if(!fsWlk||fsWlk.released){
+      fsWlk=await navigator.wakeLock.request("screen");
+      fsWlk.addEventListener("release",()=>{fsWlk=null});
+    }
+  }catch(e){}
+}
+function fsUnlock(){try{if(fsWlk){fsWlk.release();fsWlk=null}}catch(e){}}
+function openFS(){
+  if(fsOn)return;
+  /* fullscreen request must happen synchronously inside the tap */
+  try{
+    const de=document.documentElement,rq=de.requestFullscreen||de.webkitRequestFullscreen;
+    if(rq){const r=rq.call(de,{navigationUI:"hide"});if(r&&r.catch)r.catch(()=>{})}
+    else toast("এই ব্রাউজারে ফুলস্ক্রিন API নেই — হোম স্ক্রিনে যোগ করে খুললে পুরো স্ক্রিন পাবে");
+  }catch(e){}
+  const ov=fsEls();
+  fsOn=true;fsEntered=false;fsOpenAt=Date.now();fsSig="";
+  const m=document.querySelector('meta[name="theme-color"]');
+  if(m){fsPrevTheme=m.getAttribute("content");m.setAttribute("content","#000000")}
+  document.body.style.overflow="hidden";
+  document.documentElement.classList.add("fs-on");
+  ov.classList.add("show");
+  fsSize();paintFs();
+  const el=document.getElementById("fsFloat"),W=ov.clientWidth,H=ov.clientHeight,w=el.offsetWidth,h=el.offsetHeight;
+  fsX=Math.random()*Math.max(0,W-w);fsY=Math.random()*Math.max(0,H-h);
+  fsVx=(.35+Math.random()*.15)*(Math.random()<.5?-1:1);
+  fsVy=(.35+Math.random()*.15)*(Math.random()<.5?-1:1);
+  el.style.transform="translate3d("+fsX.toFixed(2)+"px,"+fsY.toFixed(2)+"px,0)";
+  const hint=document.getElementById("fsHint");
+  hint.classList.remove("off");clearTimeout(fsHintTm);
+  fsHintTm=setTimeout(()=>hint.classList.add("off"),3000);
+  fsLast=0;cancelAnimationFrame(fsRaf);fsRaf=requestAnimationFrame(fsLoop);
+  fsLock();
+}
+function closeFS(fromBrowser){
+  if(!fsOn)return;
+  fsOn=false;fsEntered=false;
+  cancelAnimationFrame(fsRaf);clearTimeout(fsHintTm);
+  const ov=document.getElementById("fsOverlay");
+  if(ov)ov.classList.remove("show");
+  document.body.style.overflow="";
+  document.documentElement.classList.remove("fs-on");
+  const m=document.querySelector('meta[name="theme-color"]');
+  if(m&&fsPrevTheme)m.setAttribute("content",fsPrevTheme);
+  fsPrevTheme=null;
+  fsUnlock();
+  if(!fromBrowser){
+    try{
+      if(document.fullscreenElement||document.webkitFullscreenElement){
+        const r=(document.exitFullscreen||document.webkitExitFullscreen).call(document);
+        if(r&&r.catch)r.catch(()=>{});
+      }
+    }catch(e){}
+  }
+  reqWL();                      /* back to the normal "keep screen on" setting */
+  paintTimer();
+}
+function fsChange(){
+  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  if(inFs)fsEntered=true;
+  else if(fsOn&&fsEntered)closeFS(true);    /* user left fullscreen with the system gesture / back button */
+}
+document.addEventListener("fullscreenchange",fsChange);
+document.addEventListener("webkitfullscreenchange",fsChange);
+document.addEventListener("keydown",e=>{if(fsOn&&e.key==="Escape")closeFS()});
+window.addEventListener("resize",()=>{if(fsOn)fsSize()});
+window.addEventListener("orientationchange",()=>{if(fsOn)setTimeout(fsSize,250)});
+document.addEventListener("visibilitychange",()=>{if(fsOn&&document.visibilityState==="visible"){fsLock();fsSize()}});
 
 /* ---- Backup & restore (everything: chapters, routine, hours, second-level logs) ---- */
 function exportBackup(){
@@ -1375,6 +1544,7 @@ function renderTimer(){
       <button class="btn skip" id="tmSkip" data-act="tmskip" style="display:none">⏭ বিরতি বাদ</button>
     </div>
     <div class="t-actions"><button class="btn tog" id="tmWl" data-act="wl">📱 স্ক্রিন চালু রাখো: বন্ধ</button></div>
+    <div class="t-actions"><button class="btn fsbtn" id="tmFs" data-act="fs">⛶ ফুল স্ক্রিন ফ্লোটিং মোড</button></div>
     <div class="tm-prog">
       <div class="row-between small"><span class="muted">আজকের লক্ষ্য · ৩০০ মিনিট</span><b id="tmTodayTxt" style="color:var(--tint2)"></b></div>
       <div class="tbar" style="margin-top:6px"><i id="tmTodayBar" style="width:0"></i></div>
@@ -1569,6 +1739,7 @@ document.getElementById("app").addEventListener("click", e=>{
   else if(act==="tmskip") skipBreak();
   else if(act==="setbook") setBook(b.dataset.b);
   else if(act==="wl") toggleWL();
+  else if(act==="fs") openFS();
   else if(act==="exp") exportBackup();
   else if(act==="imp"){ const f=$("impFile"); if(f) f.click(); }
   else if(act==="install") installApp();
