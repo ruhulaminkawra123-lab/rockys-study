@@ -2,7 +2,7 @@
    Strategy: cache-first for instant/offline start + background refresh (stale-while-revalidate).
    Also shows/handles the timer-finished system notification.
    Bump CACHE whenever index.html changes so old copies are purged. */
-const CACHE='rocky-hsc-study-v6';
+const CACHE='rocky-hsc-study-v7';
 const CORE=['./','./index.html'];
 
 self.addEventListener('install',e=>{
